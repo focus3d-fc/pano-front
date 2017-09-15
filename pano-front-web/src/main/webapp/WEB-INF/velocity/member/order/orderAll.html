@@ -67,7 +67,7 @@
 		    <div class="two_list">
 		    	<p class="fl">$!order.orderPackages.get(0).housePackage.style.name $!order.orderPackages.get(0).housePackage.house.name</p>
 		    	<small class="fr red">
-		    	#if($!order.getOrderStatus())
+		    	#if($!order.isPayComplete())
 		    	买家已付款
 		    	#else
 		    		#if($!order.needSecondPay())
@@ -121,8 +121,8 @@
 				 		已付$!{order.payMoney}元
 				 		尾款$!{order.leftMoney}元
 				 	#else 
-				 		#if($!order.getOrderStatus())
-				 		<span>合计￥$!{order.sumMoney}元</span>
+				 		#if($!order.isPayComplete())
+				 		<span>合计￥$!{order.getActPayMoney()}元</span>
 				 		#else
 				 		<span>合计￥$!{order.payMoney}元</span>
 				 		#end
@@ -130,7 +130,7 @@
 				 	</p>
 			 	</div>
 				<div class="clearfix"></div>
-				#if(!$!order.getOrderStatus())
+				#if(!$!order.isPayComplete())
 		       	<div style=" height:.8rem; background:#fff;">
 		       		#if($!order.needSecondPay())
 		       		<a href="/order/orderpage?order_sn=$!order.sn" style="margin-top:.16rem;" class="paying">立即补款</a>

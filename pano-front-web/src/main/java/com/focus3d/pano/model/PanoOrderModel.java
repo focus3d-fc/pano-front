@@ -1,5 +1,6 @@
 package com.focus3d.pano.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class PanoOrderModel extends PanoOrder<PanoOrderModel, PanoOrderCriteria>
 	 * *
 	 * @return
 	 */
-	public boolean getOrderStatus(){
+	public boolean isPayComplete(){
 		Integer status = this.getStatus();
 		if(status == 2){
 			PanoOrderModel cldOrder = getChildrenOrder();
@@ -75,7 +76,7 @@ public class PanoOrderModel extends PanoOrder<PanoOrderModel, PanoOrderCriteria>
 	 * @return
 	 */
 	public boolean needSecondPay(){
-		if(!getOrderStatus()){
+		if(!isPayComplete()){
 			//未完成支付情况
 			if(getStatus() == 2){
 				PanoOrderModel cldOrder = getChildrenOrder();
@@ -85,6 +86,16 @@ public class PanoOrderModel extends PanoOrder<PanoOrderModel, PanoOrderCriteria>
 		return false;
 	}
 
+	public String getActPayMoney(){
+		BigDecimal payMoney = getPayMoney();
+		PanoOrderModel cldOrder = getChildrenOrder();
+		if(cldOrder != null){
+			BigDecimal cldPayMoney = cldOrder.getPayMoney();
+			return payMoney.add(cldPayMoney).toString();
+		}
+		return payMoney.toString();
+	}
+	
 	@Override
 	public int hashCode() {
 		return 6 * this.getSn().hashCode();
