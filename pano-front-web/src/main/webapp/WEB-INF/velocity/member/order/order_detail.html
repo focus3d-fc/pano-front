@@ -56,18 +56,9 @@
 			<div class="cont" style="background:#fff;">
 				<a href="#"><img src="$!fs.url($!orderPackage.housePackage.imgSn)"></a>
 				<div class="detail">
-					<a href="#"><p class="detail-tlt">$!orderPackage.housePackage.style.name
-							$!orderPackage.housePackage.house.name</p></a>
 					<p class="col detail-con">$!orderPackage.housePackage.name</p>
-				</div>
-				<div class="price">
-					<p class="red">
-						￥<span class='price_val'>$!orderPackage.housePackage.packagePrice</span>
-					</p>
-					<s class="col">￥$!orderPackage.housePackage.discountPrice</s>
-					<p class="col">
-						×<span>$!orderPackage.purchaseNum</span>
-					</p>
+					<p class="red fl">￥$!orderPackage.housePackage.packagePrice <s class="col"> $!orderPackage.housePackage.discountPrice</s></p><p class="fr">$!{orderPackage.totalProductNum}件</p>
+			         
 				</div>
 			</div>
 			<div class="pro-show" style="display: none;">
@@ -90,7 +81,7 @@
 					#end
 			</div>
 			<div class="totalshow" style="text-align:center;background:#fff; border-top:1px solid #f6f6f6;line-height:.5rem;color:#d0d0d0;">
-				<a id="closeOrOpen_$!velocityCount" href="#"> 点击展开 <i class="iconfont">&#xe612;</i></a>
+				<a id="closeOrOpen_$!velocityCount" href="javascript:void(0)"> 点击展开 <i class="iconfont">&#xe612;</i></a>
 			</div>
 
 		</div>
