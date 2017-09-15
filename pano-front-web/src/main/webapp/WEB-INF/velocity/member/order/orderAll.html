@@ -109,7 +109,7 @@
 			            </a>
 			        </div>
 				#end
-			 	<div class="one_list" style="border-top:1px solid #ddd;"><p class="mar_r12" style="text-align:right;"><span>共 $!order.orderPackages.size() 件套餐</span><span>合计￥$!order.payMoney 元</span>（含运费 0.00元）</p></div>
+			 	<div class="one_list" style="border-top:1px solid #ddd;"><p class="mar_r12" style="text-align:right;"><span>共 $!order.orderPackages.size()个套餐</span><span>合计￥$!order.payMoney 元</span>（含运费 0.00元）</p></div>
 				<div class="clearfix"></div>
 				#if(($!order.status==2 and $!order.leftMoney == 0) or ($!order.status==2 and $!order.sonOrder.status == 2))
 		    	#else

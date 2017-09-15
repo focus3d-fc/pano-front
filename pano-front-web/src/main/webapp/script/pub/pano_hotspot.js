@@ -81,7 +81,7 @@ function getHouse(){
 	    		var houseImg = data[i].houseImg;
 	    		var panoId = data[i].panoId;
 	    		 var img = $("<img/>").attr("src", houseImg).attr("pano_id",panoId).attr("encryptSn", encryptSn);
-	    		 $("<div/>").addClass("bd-r2").addClass("swiper-slide" + (i == 0 ? " bd-r " : "")).append($("<div/>").append(img).append($("<p/>").text(hosueName))).appendTo($("#hx-swiper-wrapper"));
+	    		 $("<div/>").addClass("bd-r2").addClass("mar_r01").addClass("swiper-slide" + (i == 0 ? " bd-r " : "")).append($("<div/>").append(img).append($("<p/>").text(hosueName))).appendTo($("#hx-swiper-wrapper"));
 	    		//绑定点击户型图片事件，切换户型全景
 	    		img.bind("click", function(){
 	    			var houseSn = $(this).attr("encryptSn");
@@ -143,7 +143,7 @@ function getFjshow(panoId){
 	    		var sceneName = data[i].sceneName;
 	    		var sceneThumb = data[i].sceneThumb;
 	    		var img = $("<img/>").attr("src", sceneThumb).attr("scene_id",sceneId);
-	    		 $("<div/>").addClass("bd-r2").addClass("swiper-slide" + (i == 0 ? " bd-r " : "")).append($("<div/>").append(img).append($("<p/>").text(sceneName))).appendTo($("#hx-swiper-wrapper"));
+	    		 $("<div/>").addClass("bd-r2").addClass("mar_r01").addClass("swiper-slide" + (i == 0 ? " bd-r " : "")).append($("<div/>").append(img).append($("<p/>").text(sceneName))).appendTo($("#hx-swiper-wrapper"));
 	    		//点击房间图片，切换场景
 	    		img.bind("click", function(){
 	    			$("#hx-swiper-wrapper").find("img").removeClass("hxfj_border");

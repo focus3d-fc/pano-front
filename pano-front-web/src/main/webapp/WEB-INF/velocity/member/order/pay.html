@@ -117,7 +117,7 @@
     <!--图片-->
     <section class="addr-section">
         <div class="pay">
-			<div style="background-color:white;height:50px;font-size:17px;padding:12px 15px;"><span style="">订单总额</span><span style="float:right">¥: $!order.sumMoney</span></div>
+			<div style="background-color:white;height:50px;font-size:17px;padding:12px 15px;"><span style="">订单总额</span><span style="float:right">¥$!{order.sumMoney}元</span></div>
             <h5>选择支付方式</h5>
             <div class="row">
                 <p><i class="z-pay"><img src="/images/member/order/y-pay.png" alt="" ></i>银行卡</p><div pay_type="LIANPAY_AUTH" class="tick z-choose2"></div>
@@ -132,7 +132,7 @@
         </div>
     </section>
     <a class="green-btn bcdz" id="payment" style="z-index:1">
-        确认支付￥<span class="pay_amount">$!order.payMoney</span>
+        确认支付￥<span class="pay_amount">$!order.payMoney</span>元
     </a>
 
 </div>
