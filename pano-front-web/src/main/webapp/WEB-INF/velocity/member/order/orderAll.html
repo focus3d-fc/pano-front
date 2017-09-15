@@ -1,0 +1,180 @@
+#set($layout = "layout/member/order/layout_orderall.html")
+    <link rel="stylesheet" href="/style/h5static/css/bass.css">
+    <link rel="stylesheet" href="/style/h5static/css/index.css">
+    <script src="/style/admstatic/js/main.js"></script>
+<style>
+	.one_list{background-color:#fff !important; border-bottom:1px solid #e1e1e1;height:.8rem;line-height:.8rem;}
+	.one_list h6{font-size:.24rem;font-weight:bold; line-height:.8rem;padding-left:12px;}
+	.one_list span{padding-left:12px;}
+	.one_list small{margin-right:12px;}
+	.eidt{font-size:.22rem;color:#434343;margin-right:12px;line-height:.8rem;}
+	.two_list{background-color:#fff !important; border-bottom:1px solid #e1e1e1;height:.8rem;line-height:.8rem;}
+	.two_list small{margin-right:12px;line-height:.8rem;}
+	.two_list p{font-size:.24rem;line-height:.8rem;padding-left:12px;}
+	.order-items .order-item {margin-top:0 !important;background:#fff !important;}
+	.red{color:#ed1b24;}
+	.mar_r12{margin-right:12px;}
+	.paying { padding: .1rem .3rem;border-radius: .05rem; background-color: #000; color: #fff;float:right;margin-right:12px;}
+	.paying_cancel { padding: .1rem .3rem;border-radius: .05rem; background-color: rgba(0,0,0,.3); color: #fff;float:right;margin-right:12px;}
+	.nav {
+	    position: fixed;
+	    bottom: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 1.05rem;
+	    /* line-height: 1rem; */
+	    background-color: rgba(0,0,0,.3);
+	    color: #fff;
+	    display: -webkit-flex;
+	    display: -moz-flex;
+	    display: flex;
+	    display: -ms-flexbox;
+	    flex-flow: row nowrap;
+	    justify-content: space-between;
+	    text-align: right;
+	    padding: 0 .1rem;
+	    float: right;
+	    display: block;
+	}
+	.nav a p {
+    	padding-top: .05rem;
+    	font-size: .2rem;
+    	text-align: right;  
+    	padding-right:.12rem;  	
+	}
+</style>
+<div class="container">
+    <!--列表头-->
+    <section class="order-title">
+        <a href="/order/orderspage">全部</a>
+        <a href="/order/orderspage?status=1">待付款</a>
+        <a href="/order/orderspage?status=2">已付款</a>
+    </section>
+    <!--订单-->
+    #if($!orderGroupMap.size() == 0)
+     <section class="order-items">
+    	<p style="margin:auto;width:100%; text-align:center; height:8.7rem;font-size:.3rem;color:#999;">
+    	<img style="width:4rem;height:2.57rem;display:block;margin:0 auto; margin-top:2rem; margin-bottom:.5rem;" src="../images/kong-dd.png">
+    	<small>您还没有相关定单</small></p>
+     </section>
+    #else
+	    #foreach($!orderKey in $!orderGroupMap.keySet())
+	    <div class="one_list"><h6 class="fl">$!orderGroupMap.get($!orderKey).project.name</h6></div>
+	    <div class="clearfix"></div>
+			#foreach($!order in $!orderGroupMap.get($!orderKey).orders)
+		    <div class="one_list"><span class="fl">订单号:$!order.orderNum </span><small class="fr">$!date.format("yyyy-MM-dd HH:mm:ss",$!order.orderTime)</small></div>
+		    <div class="clearfix"></div>
+		    <div class="two_list">
+		    	<p class="fl">$!order.orderPackages.get(0).housePackage.style.name $!order.orderPackages.get(0).housePackage.house.name</p>
+		    	<small class="fr red">
+		    	#if(($!order.status==2 and $!order.leftMoney == 0) or ($!order.status==2 and $!order.sonOrder.status == 2))
+		    	买家已付款
+		    	#else
+		    	等待买家付款
+		    	#end
+		    	</small>
+		    </div>
+				#foreach($!orderPackage in $!order.orderPackages)
+			    <div class="clearfix"></div>
+			    <section class="order-items">
+			      <div class="order-item">
+			          <div class="cont" >
+			              <a href="#"><img src="$!fs.url($!orderPackage.housePackage.imgSn)" ></a>
+			              <div class="detail">
+			                  <a href="#"><p>$!orderPackage.housePackage.name</p></a>
+			                  <p class="red fl">￥$!orderPackage.housePackage.packagePrice <s class="col"> $!orderPackage.housePackage.discountPrice</s></p><p class="fr">$!{orderPackage.totalProductNum}件</p>
+			              </div>
+			          </div>
+			      </div>
+				  <div class="pro-show" style="display: none;">
+				  	 #foreach($!detail in $!orderPackage.details)	
+			         <div class="left">
+			            <a href="javascript:void(0)">
+			                <img src="$!fs.url($!detail.packageProduct.fullImgSn)" alt="">
+			                <div class="de">
+			                    <p>$!detail.packageProduct.name</p>
+			                    <p class="col">$!detail.packageProduct.dimension</p>
+			                    <p>$!detail.packageProduct.fabricColor x$!detail.productNum</p>
+			                </div>
+			            </a>
+			        </div>
+			        #end
+			        #if($!shopcart.details.size() % 2 != 0)
+					<div class="left"></div>
+					#end
+			        </div>
+			        <div class="total show">
+			            <a href="car.html">
+							<a id="closeOrOpen_$!velocityCount" href="javascript:void(0)" style="color:#aaa;"> 点击展开 <i class="iconfont">&#xe612;</i></a>
+			            </a>
+			        </div>
+				#end
+			 	<div class="one_list" style="border-top:1px solid #ddd;"><p class="mar_r12" style="text-align:right;"><span>共 $!order.orderPackages.size() 件套餐</span><span>合计￥$!order.payMoney 元</span>（含运费 0.00元）</p></div>
+				<div class="clearfix"></div>
+				#if(($!order.status==2 and $!order.leftMoney == 0) or ($!order.status==2 and $!order.sonOrder.status == 2))
+		    	#else
+		       	<div style=" height:.8rem; background:#fff;">
+		       		<a href="/order/orderpage?order_sn=$!order.sn" style="margin-top:.16rem;" class="paying">立即付款</a>
+		       		<a id="cancelOrder" order_sn="$!order.sn" href="javascript:void(0)" style="margin-top:.16rem;" class="paying_cancel">取消付款</a>
+		       	</div>
+		    	#end
+		        <div class="clearfix"></div>
+			#end
+		#end
+    </section>
+    #end
+    <div style="height:1.1rem;"></div>
+ 
+    <nav class="nav">
+        <a href="/index"  id="tcshow">
+            <img style="width:.65rem;height:.65rem;" src="$!fs.url($!{img_home})" alt="">
+            <p>首页</p>
+        </a>
+        <!-- 
+        
+        <a href="/fp/720?style_id=$!styleId" id="hxshow">
+            <img style="width:.65rem;height:.65rem;" src="$!fs.url($!{img_house})" alt="">
+            <p>户型</p>
+        </a>
+        <a href="/fp/720?style_id=$!styleId" id="fjshow">
+            <img style="width:.65rem;height:.65rem;" src="$!fs.url($!{img_space})" alt="">
+            <p>房间</p>
+        </a>
+        <a href="/shopcart/list?styleId=$!styleId&projectSn=$!project.encryptSn" class="on">
+            <img style="width:.65rem;height:.65rem;" src="$!fs.url($!{img_tc})" alt="">
+            <p>套餐</p>
+        </a>
+         -->
+    </nav>
+</div>
+<input type="hidden" id="status" value="$!status"/>
+<script>
+
+$(function(){
+	var status = parseInt($!("#status").val());
+	$(".order-title").children().removeClass("on");
+	$(".order-title").find("a:eq(" +　status　+　")").addClass("on");
+	//点击展开收起
+	$("a[id^='closeOrOpen_']").click(function(){
+		var status = $(this).attr("status");
+		if(!status || status == 0){
+			$(this).parent().prev().show(200);
+			$(this).text("");
+			$(this).append("点击收起 <i class='iconfont'>&#xe60c;</i>");
+			$(this).attr("status", 1);
+		} else {
+			$(this).parent().prev().hide(200);
+			$(this).text("");
+			$(this).append("点击展开 <i class='iconfont'>&#xe612;</i>");
+			$(this).attr("status", 0);
+		}
+	});
+	
+	$("#cancelOrder").click(function(){
+		if(confirm("确认删除订单？")){
+			var orderSn = $(this).attr("order_sn");
+			window.location.href = "/order/cancel?order_sn=" + orderSn;
+		}
+	})
+});
+</script>
