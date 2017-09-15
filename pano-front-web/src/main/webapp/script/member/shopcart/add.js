@@ -62,7 +62,7 @@ $(function(){
 			$("#selectAll").attr("status", 0);
 			totalPrice -= price;
 		}
-		$("#totalPrice").text(totalPrice);
+		$("#totalPrice").text(totalPrice.toFixed(2));
 	});
 	
 	$("#selectAll").click(function(){
@@ -83,7 +83,7 @@ $(function(){
 			$("div[id^='choose_']").attr("status", 0);
 			$("div[id^='choose_']").removeClass("imgChoose");
 		}
-		$("#totalPrice").text(totalPrice);
+		$("#totalPrice").text(totalPrice.toFixed(2));
 	});
 	//点击展开收起
 	$("a[id^='closeOrOpen_']").click(function(){
