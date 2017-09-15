@@ -473,7 +473,7 @@ public class PanoOrderController extends AbstractPanoController {
 				}
 				packages.add(pack);
 				int packageCount = Integer.parseInt(packageCounts[i]);
-				actualAmount = actualAmount + pack.getPackagePrice().floatValue() * packageCount;
+				actualAmount = actualAmount + pack.getDiscountPrice().floatValue() * packageCount;
 				totalPackageCount = totalPackageCount + packageCount;
 			}
 			dueAmount = actualAmount;

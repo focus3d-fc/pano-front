@@ -42,7 +42,7 @@
 				<div class="detail">
 					<a href="#"><p class="detail-tlt">$!shopcart.housePackage.name</p></a>
 					<p class="red">
-	                    	￥$!shopcart.housePackage.packagePrice<s class="col"> ￥$!shopcart.housePackage.discountPrice</s>
+	                    	￥$!shopcart.housePackage.discountPrice<s class="col"> ￥$!shopcart.housePackage.packagePrice</s>
 	                    	<small class="fr col">$!shopcart.totalProductNum件</small>
 	                    </p>
 				</div>
@@ -164,7 +164,7 @@ var packages = new Object();
 
 #foreach($!shopcart in $!shopcartList)
 	packages['$!shopcart.housePackage.sn'] = new Object();
-	packages['$!shopcart.housePackage.sn'].price=$!shopcart.housePackage.packagePrice
+	packages['$!shopcart.housePackage.sn'].price=$!shopcart.housePackage.discountPrice
 	packages['$!shopcart.housePackage.sn'].count=1
 #end
 

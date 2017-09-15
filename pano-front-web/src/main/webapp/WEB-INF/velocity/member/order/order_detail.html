@@ -57,7 +57,7 @@
 				<a href="#"><img src="$!fs.url($!orderPackage.housePackage.imgSn)"></a>
 				<div class="detail">
 					<p class="col detail-con">$!orderPackage.housePackage.name</p>
-					<p class="red fl">￥$!orderPackage.housePackage.packagePrice <s class="col"> $!orderPackage.housePackage.discountPrice</s></p><p class="fr">$!{orderPackage.totalProductNum}件</p>
+					<p class="red fl">￥$!orderPackage.housePackage.discountPrice <s class="col"> $!orderPackage.housePackage.packagePrice</s></p><p class="fr">$!{orderPackage.totalProductNum}件</p>
 			         
 				</div>
 			</div>
@@ -68,8 +68,8 @@
 							<img src="$!fs.url($!detail.packageProduct.fullImgSn)" alt="">
 							<div class="de">
 								<p>$!detail.packageProduct.name</p>
-								<p class="col">$!{detail.packageProduct.length}*$!{detail.packageProduct.wide}*$!detail.packageProduct.height</p>
-								<p>$!detail.packageProduct.fabricColor</p>
+								<p class="col">$!detail.packageProduct.dimension</p>
+								<p>$!detail.packageProduct.fabricColor x$!detail.productNum</p>
 							</div>
 						</a>
 					</div>
@@ -105,23 +105,17 @@
           </div>
          #end
           <div>
-          <div style="color:red;line-height:.4rem;"> 
+          <div style="color:red;line-height:.4rem;">
           		#if($!order.leftPay==0)
 	          		#if($!order.status==1)
 	          			<div style="height:.4rem;line-height:.4rem;">商品金额：未支付</div>
 	          		 #end 
-	          		<!--  #if($!order.status==1)
-	          			<div>商品金额：已支付</div>
-	          		 #end  -->
           		 #end 
           		 #if($!order.leftPay==1)
           			#if($!order.status==1) 
           		 		<div><div style="border-left:3px solid red;display:inline-block;height:12px;margin-right:3px;margin-left:-8px"></div>商品定金：未支付</div>
           		 	#end 
-          		 	<!-- #if($!order.status==2 and $!order.sonOrder.status==2) 
-          		 		<div>商品金额：已支付</div>
-          		 	#end  -->
-          		 	#if($!order.status==2 and $!order.sonOrder.status==1) 
+          		 	#if($!order.status==2 and $!order.childrenOrder.status==1)
           		 		<div>商品尾款： 未支付</div>
           		 	#end
           		 #end 
@@ -158,11 +152,11 @@
           			#if($!order.status==1) 
           		 		<a class="tj" style="float:right;background-color:black;color:white;padding:3px 8px;border-radius:5px;display:inline-block;" onclick="location.href='/order/topaypage?order_sn=$!order.sn'">立即支付</a>
           		 	#end 
-          		 	#if($!order.status==2 and $!order.sonOrder.status==2) 
+          		 	#if($!order.status==2 and $!order.childrenOrder.status==2) 
           		 	<span style="float:right;">已支付</span>
           		 	#end 
-          		 	#if($!order.status==2 and $!order.sonOrder.status==1) 
-          		 		<span style="margin-top:5px;display:inline-block;">等待买家补齐尾款</span> <a class="tj" style="float:right;background-color:black;color:white;padding:3px 8px;border-radius:5px;display:inline-block;" onclick="location.href='/order/topaypage?order_sn=$!order.sonOrder.sn'">立即补款</a>
+          		 	#if($!order.status==2 and $!order.childrenOrder.status==1) 
+          		 		<span style="margin-top:5px;display:inline-block;">等待买家补齐尾款</span> <a class="tj" style="float:right;background-color:black;color:white;padding:3px 8px;border-radius:5px;display:inline-block;" onclick="location.href='/order/topaypage?order_sn=$!order.childrenOrder.sn'">立即补款</a>
           		 	#end
           		 #end 
        </div>

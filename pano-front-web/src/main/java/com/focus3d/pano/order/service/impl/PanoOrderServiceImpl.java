@@ -91,10 +91,15 @@ public class PanoOrderServiceImpl extends CommonServiceImpl<PanoOrderModel> impl
 	@Override
 	public PanoOrderModel setOrderDetail(PanoOrderModel order) {
 		PanoUserReceiveAddressModel address = receiveAddressService.getBySn(order.getAddressSn());
-		PanoOrderCouponItemModel coupon = panoOrderCouponItemDao.getByOrderSn(order.getSn());
+		Long orderSn = order.getSn();
+		PanoOrderCouponItemModel coupon = panoOrderCouponItemDao.getByOrderSn(orderSn);
+		PanoOrderModel childrenOrder = orderDao.getChildrenOrder(orderSn);
+		if(childrenOrder != null){
+			order.setChildrenOrder(childrenOrder);
+		}
 		order.setAddress(address);
 		order.setCouponItem(coupon);
-		List<PanoOrderPackageModel> orderPackages = orderPackageDao.listByOrder(order.getSn());
+		List<PanoOrderPackageModel> orderPackages = orderPackageDao.listByOrder(orderSn);
 		for (PanoOrderPackageModel orderPackage : orderPackages) {
 			//订单套餐明细信息
 			List<PanoOrderPackageDetailModel> orderPackageDetails = orderPackageDetailDao.listByOrderPackage(orderPackage.getSn());

@@ -82,7 +82,7 @@
 			              <a href="#"><img src="$!fs.url($!orderPackage.housePackage.imgSn)" ></a>
 			              <div class="detail">
 			                  <a href="#"><p>$!orderPackage.housePackage.name</p></a>
-			                  <p class="red fl">￥$!orderPackage.housePackage.packagePrice <s class="col"> $!orderPackage.housePackage.discountPrice</s></p><p class="fr">$!{orderPackage.totalProductNum}件</p>
+			                  <p class="red fl">￥$!orderPackage.housePackage.discountPrice <s class="col"> $!orderPackage.housePackage.packagePrice</s></p><p class="fr">$!{orderPackage.totalProductNum}件</p>
 			              </div>
 			          </div>
 			      </div>
@@ -115,7 +115,7 @@
 		    	#else
 		       	<div style=" height:.8rem; background:#fff;">
 		       		<a href="/order/orderpage?order_sn=$!order.sn" style="margin-top:.16rem;" class="paying">立即付款</a>
-		       		<a id="cancelOrder" order_sn="$!order.sn" href="javascript:void(0)" style="margin-top:.16rem;" class="paying_cancel">取消付款</a>
+		       		<a id="cancelOrder_$!order.sn" order_sn="$!order.sn" href="javascript:void(0)" style="margin-top:.16rem;" class="paying_cancel">取消付款</a>
 		       	</div>
 		    	#end
 		        <div class="clearfix"></div>
@@ -170,7 +170,7 @@ $(function(){
 		}
 	});
 	
-	$("#cancelOrder").click(function(){
+	$("a[id^='cancelOrder_'").click(function(){
 		if(confirm("确认删除订单？")){
 			var orderSn = $(this).attr("order_sn");
 			window.location.href = "/order/cancel?order_sn=" + orderSn;
