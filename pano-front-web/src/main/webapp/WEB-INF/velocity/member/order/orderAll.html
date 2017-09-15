@@ -67,10 +67,14 @@
 		    <div class="two_list">
 		    	<p class="fl">$!order.orderPackages.get(0).housePackage.style.name $!order.orderPackages.get(0).housePackage.house.name</p>
 		    	<small class="fr red">
-		    	#if(($!order.status==2 and $!order.leftMoney == 0) or ($!order.status==2 and $!order.sonOrder.status == 2))
+		    	#if($!order.getOrderStatus())
 		    	买家已付款
 		    	#else
-		    	等待买家付款
+		    		#if($!order.needSecondPay())
+		    		等待买家补款
+		    		#else
+		    		等待买家付款
+		    		#end
 		    	#end
 		    	</small>
 		    </div>
@@ -109,13 +113,31 @@
 			            </a>
 			        </div>
 				#end
-			 	<div class="one_list" style="border-top:1px solid #ddd;"><p class="mar_r12" style="text-align:right;"><span>共 $!order.orderPackages.size()个套餐</span><span>合计￥$!order.payMoney 元</span>（含运费 0.00元）</p></div>
+			 	<div class="one_list" style="border-top:1px solid #ddd;">
+				 	<p class="mar_r12" style="text-align:right;">
+				 	<span>共$!order.orderPackages.size()个套餐</span>
+				 	#if($!order.needSecondPay())
+				 		<span>合计￥$!{order.sumMoney}元</span>
+				 		已付$!{order.payMoney}元
+				 		尾款$!{order.leftMoney}元
+				 	#else 
+				 		#if($!order.getOrderStatus())
+				 		<span>合计￥$!{order.sumMoney}元</span>
+				 		#else
+				 		<span>合计￥$!{order.payMoney}元</span>
+				 		#end
+				 	#end（运费0元）
+				 	</p>
+			 	</div>
 				<div class="clearfix"></div>
-				#if(($!order.status==2 and $!order.leftMoney == 0) or ($!order.status==2 and $!order.sonOrder.status == 2))
-		    	#else
+				#if(!$!order.getOrderStatus())
 		       	<div style=" height:.8rem; background:#fff;">
+		       		#if($!order.needSecondPay())
+		       		<a href="/order/orderpage?order_sn=$!order.sn" style="margin-top:.16rem;" class="paying">立即补款</a>
+		       		#else
 		       		<a href="/order/orderpage?order_sn=$!order.sn" style="margin-top:.16rem;" class="paying">立即付款</a>
 		       		<a id="cancelOrder_$!order.sn" order_sn="$!order.sn" href="javascript:void(0)" style="margin-top:.16rem;" class="paying_cancel">取消付款</a>
+		       		#end
 		       	</div>
 		    	#end
 		        <div class="clearfix"></div>
@@ -130,21 +152,6 @@
             <img style="width:.65rem;height:.65rem;" src="$!fs.url($!{img_home})" alt="">
             <p>首页</p>
         </a>
-        <!-- 
-        
-        <a href="/fp/720?style_id=$!styleId" id="hxshow">
-            <img style="width:.65rem;height:.65rem;" src="$!fs.url($!{img_house})" alt="">
-            <p>户型</p>
-        </a>
-        <a href="/fp/720?style_id=$!styleId" id="fjshow">
-            <img style="width:.65rem;height:.65rem;" src="$!fs.url($!{img_space})" alt="">
-            <p>房间</p>
-        </a>
-        <a href="/shopcart/list?styleId=$!styleId&projectSn=$!project.encryptSn" class="on">
-            <img style="width:.65rem;height:.65rem;" src="$!fs.url($!{img_tc})" alt="">
-            <p>套餐</p>
-        </a>
-         -->
     </nav>
 </div>
 <input type="hidden" id="status" value="$!status"/>

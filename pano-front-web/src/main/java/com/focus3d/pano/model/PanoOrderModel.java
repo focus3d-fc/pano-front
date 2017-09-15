@@ -52,6 +52,38 @@ public class PanoOrderModel extends PanoOrder<PanoOrderModel, PanoOrderCriteria>
 	public void setAddress(PanoUserReceiveAddressModel address) {
 		this.address = address;
 	}
+	/**
+	 * 获取订单状态
+	 * *
+	 * @return
+	 */
+	public boolean getOrderStatus(){
+		Integer status = this.getStatus();
+		if(status == 2){
+			PanoOrderModel cldOrder = getChildrenOrder();
+			if(cldOrder != null){
+				return cldOrder.getStatus() == 2;
+			} 
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * 是否需要补款
+	 * *
+	 * @return
+	 */
+	public boolean needSecondPay(){
+		if(!getOrderStatus()){
+			//未完成支付情况
+			if(getStatus() == 2){
+				PanoOrderModel cldOrder = getChildrenOrder();
+				return cldOrder.getStatus() == 1;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public int hashCode() {
