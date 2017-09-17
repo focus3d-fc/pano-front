@@ -200,11 +200,11 @@ function calculate(){
 		stage1Amount= parseFloat(stage1Amount.toFixed(2))
 		var stage2Amount = payAmount - stage1Amount;
 		payAmount=stage1Amount;
-		$('.new-tjdd .red').text(payAmount)
+		$('.new-tjdd .red').text(payAmount.toFixed(2))
 		$('.new-tjdd .totalCount').text(totalCount)
 		$('.couponAmount').text(couponAmount)
-		$('.stage1Amount').text(stage1Amount)
-		$('.stage2Amount').text(stage2Amount)
+		$('.stage1Amount').text(stage1Amount.toFixed(2))
+		$('.stage2Amount').text(stage2Amount.toFixed(2));
 		$('.payAmountDesc').text('定金')
 		
 		
