@@ -65,7 +65,9 @@ import com.focus3d.pano.pub.controller.AbstractPanoController;
 import com.focus3d.pano.shopcart.service.PanoOrderShopCartService;
 import com.focus3d.pano.sms.service.SmsValidateService;
 import com.focus3d.pano.user.service.PanoMemUserService;
+import com.focus3d.pano.utils.PayUtils;
 import com.focustech.common.utils.EncryptUtil;
+import com.focustech.common.utils.TCUtil;
 import com.lianpay.share.security.Md5Algorithm;
 import com.lianpay.share.util.DateUtil;
 import com.llpay.client.vo.PayDataBean;
@@ -875,11 +877,10 @@ public class PanoOrderController extends AbstractPanoController {
 			if (!resData.getIsSuccess())
 				throw new RuntimeException(resData.getWorkedMsg());
 
-			BigDecimal payAmount = new BigDecimal(Integer.parseInt(resData
-					.getTotal_fee()) / 100d).setScale(2, RoundingMode.DOWN);
-
+			//BigDecimal payAmount = new BigDecimal(Integer.parseInt(resData.getTotal_fee()) / 100d).setScale(2, RoundingMode.DOWN);
+			String payAmount = PayUtils.convertFen2Yuan(new BigDecimal(resData.getTotal_fee()));
 			PanoOrderModel orderModel = orderService.getOrderByNum(resData.getOut_trade_no());
-			if (payAmount.compareTo(orderModel.getPayMoney()) != 0) {
+			if (!payAmount.equals(TCUtil.sv(orderModel.getPayMoney()))) {
 				throw new RuntimeException("支付金额不对");
 			}
 			if (orderModel.getStatus().compareTo(2) == 0) {
@@ -893,7 +894,7 @@ public class PanoOrderController extends AbstractPanoController {
 			orderTransModel.setTransDate(new Date());
 			orderTransModel.setTransType("001");
 			orderTransModel.setTransPlatformType(1);
-			orderTransModel.setTransMoney(payAmount);
+			orderTransModel.setTransMoney(new BigDecimal(payAmount));
 			orderTransModel.setTransId(resData.getTransaction_id());
 			orderTransModel.setTransStatus("SUCCESS");
 			panoOrderTransService.insert(orderTransModel);
@@ -909,7 +910,6 @@ public class PanoOrderController extends AbstractPanoController {
 
 		}
 	}
-	
 	/**
 	 * 微信异步通知
 	 * @param request
