@@ -144,7 +144,7 @@
 					placeholder="验证码" name="verifycode"> <span
 					id="j_getVerifyCode" class="new_yzm">获取验证码</span>
 			</div>
-			<button type="button" onclick="create_order()">立即验证</button>
+			<button id="validateOrder" type="button">立即验证</button>
 		</form>
 	</div>
 </div>
@@ -356,53 +356,59 @@ function choosePayScheme(paySchemeParam,ele){
 		calculate()
    }
    
-    function create_order(){
-    	var mobile_phone = $('div#confirm [name=mobile_phone]').val();
-    	var verifycode = $('div#confirm [name=verifycode]').val();
-    	if(!addressSn){
-    		alert('请选择收货地址');
-    		return ;
-    	}
-    	if(!$("#regMobile").val()){
-	    	if(!mobile_phone){
-	    		alert('请输入手机号');
-	    		return ;
-	    	}
-	    	if(!verifycode){
-	    		alert('请输入验证码');
-	    		return ;
-	    	}
-    	}
-    	 $.ajax({
-             type: 'POST',
-             async: false,
-             data: {
-            	 mobile_phone:mobile_phone,
-            	 verifycode:verifycode,
-            	 coupon_code:couponCode,
-            	 pay_scheme:payScheme,
-            	 address_sn:addressSn,
-            	 package_sns:orderparam_package_sns,
-    	 		 package_counts:orderparam_package_counts
-    	 
-             },
-             url: '/order/create',
-             dataType: 'json',
-             success: function (data) {
-             	if(data.status != 0){
-             		alert(data.statusMsg)
-             		return;
-             	}else{
-             		window.location.href='/order/topaypage?order_sn='+data.orderSn;
-             	}
-             },
-             error:function(xhr,textStatus){
-     	    	if(xhr.getResponseHeader('sessionstatus') === "timeout"){
-     	    		window.location.href = "/member/login/nomal";
-     	    	}
-     	    }
-             })
-        
-    }
+   function create_order(){
+	   	var status = $(this).attr("status");
+	   	if(!status){
+	   		$(this).attr("status", "1");
+	   	} else {
+	   		return;
+	   	}
+	   	console.info(status);
+	   	var mobile_phone = $('div#confirm [name=mobile_phone]').val();
+	   	var verifycode = $('div#confirm [name=verifycode]').val();
+	   	if(!addressSn){
+	   		alert('请选择收货地址');
+	   		return ;
+	   	}
+	   	if(!$("#regMobile").val()){
+		    	if(!mobile_phone){
+		    		alert('请输入手机号');
+		    		return ;
+		    	}
+		    	if(!verifycode){
+		    		alert('请输入验证码');
+		    		return ;
+		    	}
+	   	}
+	   	 $.ajax({
+	            type: 'POST',
+	            async: false,
+	            data: {
+	           	 mobile_phone:mobile_phone,
+	           	 verifycode:verifycode,
+	           	 coupon_code:couponCode,
+	           	 pay_scheme:payScheme,
+	           	 address_sn:addressSn,
+	           	 package_sns:orderparam_package_sns,
+	   	 		 package_counts:orderparam_package_counts
+	   	 
+	            },
+	            url: '/order/create',
+	            dataType: 'json',
+	            success: function (data) {
+	            	if(data.status != 0){
+	            		alert(data.statusMsg)
+	            		return;
+	            	}else{
+	            		window.location.href='/order/topaypage?order_sn='+data.orderSn;
+	            	}
+	            },
+	            error:function(xhr,textStatus){
+	    	    	if(xhr.getResponseHeader('sessionstatus') === "timeout"){
+	    	    		window.location.href = "/member/login/nomal";
+	    	    	}
+	    	    }
+			});
+   }
 </script>
 <script src="/script/member/order/confirm.js"></script>
