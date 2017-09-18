@@ -2,7 +2,6 @@ package com.focus3d.pano.order.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,6 +40,7 @@ import com.focus3d.pano.member.service.PanoUserReceiveAddressService;
 import com.focus3d.pano.model.PanoMemLoginModel;
 import com.focus3d.pano.model.PanoMemUserModel;
 import com.focus3d.pano.model.PanoOrderCouponItemModel;
+import com.focus3d.pano.model.PanoOrderCouponModel;
 import com.focus3d.pano.model.PanoOrderModel;
 import com.focus3d.pano.model.PanoOrderPackageDetailModel;
 import com.focus3d.pano.model.PanoOrderPackageModel;
@@ -196,17 +196,15 @@ public class PanoOrderController extends AbstractPanoController {
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/coupon")
-	public void coupon(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public void coupon(HttpServletRequest request, HttpServletResponse response)throws IOException {
 		String code = request.getParameter("code");
-		PanoOrderCouponItemModel panoOrderCouponItemModel = panoOrderCouponItemService
-				.getByCode(code);
-
+		PanoOrderCouponItemModel panoOrderCouponItemModel = panoOrderCouponItemService.getByCode(code);
 		JSONObject jo = new JSONObject();
 		if (panoOrderCouponItemModel != null) {
 			jo.put("status", panoOrderCouponItemModel.getStatus());
-			jo.put("discountAmount",
-					panoOrderCouponItemModel.getPriceDiscount());
+			PanoOrderCouponModel coupon = panoOrderCouponItemModel.getCoupon();
+			jo.put("discountAmount", coupon.getPriceDiscount());
+			jo.put("useCondition", coupon.getUseCondition());
 		}
 		ajaxOutput(response, jo.toString());
 	}
@@ -494,8 +492,9 @@ public class PanoOrderController extends AbstractPanoController {
 				} else if (coupon.getStatus() != 0) {
 					throw new RuntimeException("优惠券不可用");
 				}
-				discountAmount = coupon.getPriceDiscount().floatValue();
-				dueAmount = dueAmount - coupon.getPriceDiscount().floatValue();
+				PanoOrderCouponModel cp = coupon.getCoupon();
+				discountAmount = cp.getPriceDiscount().floatValue();
+				dueAmount = dueAmount - discountAmount;
 			}
 
 			// 分支付方案处理

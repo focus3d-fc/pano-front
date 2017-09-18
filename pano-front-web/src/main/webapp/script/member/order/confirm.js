@@ -35,4 +35,13 @@ $(function(){
 			$(this).attr("src", "/images/choose4.png");
 		}
 	});
+	
+	/*$("#couponCode").keydown(function(){
+		var couponCode = $("#couponCode").val();
+		alert(couponCode.length);
+		if(!couponCode && couponAmount > 0){
+			couponAmount = 0;
+			calculate();
+		}
+	});*/
 });

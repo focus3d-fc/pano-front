@@ -40,6 +40,7 @@ public class PanoOrderCouponItemServiceImpl extends CommonServiceImpl<PanoOrderC
 			Long couponSn = couponItem.getCouponSn();
 			PanoOrderCouponModel coupon = orderCouponDao.getBySn(couponSn);
 			if(coupon != null){
+				couponItem.setCoupon(coupon);
 				int status = 0;
 				try {
 					Date startDate = coupon.getStartDate();
@@ -55,7 +56,6 @@ public class PanoOrderCouponItemServiceImpl extends CommonServiceImpl<PanoOrderC
 						status = 3;//已被使用过
 					}
 					couponItem.setStatus(status);
-					couponItem.setPriceDiscount(coupon.getPriceDiscount());
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}

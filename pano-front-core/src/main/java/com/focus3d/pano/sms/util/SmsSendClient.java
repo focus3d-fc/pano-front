@@ -13,7 +13,14 @@ import com.focus3d.pano.sms.util.ChuangLanSmsUtil;
  *
  */
 public class SmsSendClient {
-
+	/**
+	 * 新申请的，还没有付款成功
+	 * 
+	 * 创蓝的API接口信息账号：N2792621
+密码：bA88tzx6h
+接口：http://smssh1.253.com/msg/send/json
+	 * *
+	 */
 	public static final String charset = "utf-8";
 	// 用户平台API账号(非登录账号,示例:N1234567)
 	public static String account = "N7630417";

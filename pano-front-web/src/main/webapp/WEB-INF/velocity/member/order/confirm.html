@@ -68,9 +68,9 @@
                 
                 <p class="couponCodeSquares" 
                 				onclick="$('[name=couponCode]').focus();">
-				<input type="tel"  maxLength="6" oninput="couponcode_input()"
+				<input type="tel"  maxLength="6" onkeyup="couponcode_input()"
 					style="width:100px;"
-					name="couponCode" />
+					name="couponCode" id="couponCode"/>
                     <span class="square" style="display: none;"></span>
                     <span class="square" style="display: none;"></span>
                     <span class="square" style="display: none;"></span>
@@ -154,6 +154,7 @@
 var payScheme='FULL'; // FULL全款 STAGES分期
 var payAmount = 0;
 var couponAmount = 0;
+var couponUseCondition = 0;
 var addressSn = '$!defaultAddress.sn';
 var couponCode = null;
 var orderparam_package_sns = new Array();
@@ -188,7 +189,15 @@ function calculate(){
 	//下单参数某位补0
 	orderparam_package_sns[i] = 0;
 	orderparam_package_counts[i] = 0;
-	
+	if($("#couponCode").val()){
+		if(payAmount < couponUseCondition){
+			alert("该优惠券使用条件是订单金额满" + couponUseCondition + "元");
+			$("#couponCode").val("");
+			couponAmount = 0;
+			couponUseCondition = 0;
+			couponCode = "";
+		}
+	}
 	payAmount = payAmount - couponAmount;
 	if(payScheme == 'FULL'){
 		payAmount = parseFloat((payAmount*0.95).toFixed(2));
@@ -322,6 +331,7 @@ function choosePayScheme(paySchemeParam,ele){
                     }
                     else{
                     	couponAmount = data.discountAmount;
+                    	couponUseCondition = data.useCondition;
                     	couponCode = event.target.value;
                     	calculate();
                     }
@@ -331,9 +341,12 @@ function choosePayScheme(paySchemeParam,ele){
                     alert('优惠券获取失败')
                 }
             });
+		} else {
+			couponAmount = 0;
+			couponCode = "";
+			calculate();
+		}
 	}
-    	
-}
     
     function subCount(packageId){
 		var count = parseInt($('#'+packageId+' .buyCount').text())-1;
