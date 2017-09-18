@@ -153,8 +153,8 @@
     <div style="height:1.1rem;"></div>
  
     <nav class="nav">
-        <a href="/index"  id="tcshow">
-            <img style="width:.65rem;height:.65rem;filter:Invert();" src="$!fs.url($!{img_home})" alt="">
+        <a href="javascript:void(0)">
+            <img id="toIndex" style="width:.65rem;height:.65rem;filter:Invert();" src="$!fs.url($!{img_home})" alt="">
             <p style="color: black;">首页</p>
         </a>
     </nav>
@@ -188,5 +188,9 @@ $(function(){
 			window.location.href = "/order/cancel?order_sn=" + orderSn;
 		}
 	})
+	
+	$("#toIndex").click(function(){
+		window.location.href = "/index";
+	});
 });
 </script>
