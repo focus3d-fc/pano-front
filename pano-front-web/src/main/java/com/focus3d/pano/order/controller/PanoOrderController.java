@@ -127,8 +127,10 @@ public class PanoOrderController extends AbstractPanoController {
 		if (userBankcards != null && !userBankcards.isEmpty()) {
 			PanoUserBankcardModel bankcard = userBankcards.get(0);
 			String maskName = Override.getMaskCharWay(bankcard.getUserName(), 1, 1);
-			String maskCardNo = Override.getMaskCharWay(bankcard.getCardNo(), 6, 12);
-			String maskCertNo = Override.getMaskCharWay(bankcard.getCertNo(), 10, 15);
+			String cardNo = bankcard.getCardNo();
+			String maskCardNo = Override.getMaskCharWay(cardNo, cardNo.length() / 2, cardNo.length() - 1);
+			String certNo = bankcard.getCertNo();
+			String maskCertNo = Override.getMaskCharWay(certNo, certNo.length() / 2, certNo.length() - 2);
 			bankcard.setMaskName(maskName);
 			bankcard.setMaskCardNo(maskCardNo);
 			bankcard.setMaskCertNo(maskCertNo);
@@ -281,9 +283,13 @@ public class PanoOrderController extends AbstractPanoController {
 				}
 				if (cardNo == null){
 					throw new RuntimeException("请输入卡号");
+				} else if(cardNo.length() < 10){
+					throw new RuntimeException("卡号输入有误");
 				}
 				if (idNo == null){
 					throw new RuntimeException("请输入身份证");
+				} else if(idNo.length() < 10){
+					throw new RuntimeException("身份证号码输入有误");
 				}
 				// 保存银行卡信息
 				PanoUserBankcardModel userBankcard = null;
