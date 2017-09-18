@@ -5,7 +5,14 @@ $(function(){
 			alert("请阅读并同意合同条款");
 		} else {
 			if($("#regMobile").val() == "true"){
-				create_order();
+				var totalPayMoney = $("#totalPayMoney").text();
+				if(totalPayMoney){
+					if(parseFloat(totalPayMoney).toFixed(2) <= 0){
+						alert("订单有误，请联系客服。");
+					} else {
+						create_order();
+					}
+				}
 			} else {
 				$('.wrap1').show();
 			}

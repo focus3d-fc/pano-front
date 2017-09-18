@@ -69,14 +69,14 @@
                 <p class="couponCodeSquares" 
                 				onclick="$('[name=couponCode]').focus();">
 				<input type="tel"  maxLength="6" oninput="couponcode_input()"
-					style=" outline: medium; color: transparent; border: none;width:60px;"
+					style="width:100px;"
 					name="couponCode" />
-                    <span class="square"></span>
-                    <span class="square"></span>
-                    <span class="square"></span>
-                    <span class="square"></span>
-                    <span class="square"></span>
-                    <span class="square"></span>
+                    <span class="square" style="display: none;"></span>
+                    <span class="square" style="display: none;"></span>
+                    <span class="square" style="display: none;"></span>
+                    <span class="square" style="display: none;"></span>
+                    <span class="square" style="display: none;"></span>
+                    <span class="square" style="display: none;"></span>
                 </p>
                 
             </div>
@@ -113,7 +113,7 @@
             
             <div class="new-tjdd">
             <p class="fl tx-center">
-                共 <span class="totalCount"></span>个套餐 <span class="payAmountDesc">合计</span>￥<span class="red"></span>元</p>
+                共 <span class="totalCount"></span>个套餐 <span class="payAmountDesc">合计</span>￥<span id="totalPayMoney" class="red"></span>元</p>
                 <a id="submitOrder" class="tj fr">
                     提交订单
                 </a>
