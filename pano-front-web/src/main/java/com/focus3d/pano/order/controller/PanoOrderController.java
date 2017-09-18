@@ -65,6 +65,7 @@ import com.focus3d.pano.pub.controller.AbstractPanoController;
 import com.focus3d.pano.shopcart.service.PanoOrderShopCartService;
 import com.focus3d.pano.sms.service.SmsValidateService;
 import com.focus3d.pano.user.service.PanoMemUserService;
+import com.focus3d.pano.utils.Override;
 import com.focus3d.pano.utils.PayUtils;
 import com.focustech.common.utils.EncryptUtil;
 import com.focustech.common.utils.TCUtil;
@@ -124,7 +125,14 @@ public class PanoOrderController extends AbstractPanoController {
 		String orderSn = request.getParameter("order_sn");
 		List<PanoUserBankcardModel> userBankcards = userBankcardService.listByUser(userSn);
 		if (userBankcards != null && !userBankcards.isEmpty()) {
-			map.put("userBankcard", userBankcards.get(0));
+			PanoUserBankcardModel bankcard = userBankcards.get(0);
+			String maskName = Override.getMaskCharWay(bankcard.getUserName(), 1, 1);
+			String maskCardNo = Override.getMaskCharWay(bankcard.getCardNo(), 6, 12);
+			String maskCertNo = Override.getMaskCharWay(bankcard.getCertNo(), 10, 15);
+			bankcard.setMaskName(maskName);
+			bankcard.setMaskCardNo(maskCardNo);
+			bankcard.setMaskCertNo(maskCertNo);
+			map.put("userBankcard", bankcard);
 		}
 		PanoOrderModel order = orderService.getOrderDetail(Long.parseLong(orderSn));
 		map.put("order", order);
@@ -269,7 +277,7 @@ public class PanoOrderController extends AbstractPanoController {
 				String cardNo = StringUtils.trimToNull(request.getParameter("card_no"));
 				String idNo = StringUtils.trimToNull(request.getParameter("id_no"));
 				String userBankcardSnParam = StringUtils.trimToNull(request.getParameter("user_bankcard_sn"));
-				Long userBankcardSn = userBankcardSnParam == null ? null : Long.parseLong(userBankcardSnParam);
+				Long userBankcardSn = TCUtil.lv(userBankcardSnParam);
 				if (acctName == null){
 					throw new RuntimeException("请输入姓名");
 				}
@@ -281,17 +289,8 @@ public class PanoOrderController extends AbstractPanoController {
 				}
 				// 保存银行卡信息
 				PanoUserBankcardModel userBankcard = null;
-				if (userBankcardSn != null) {
+				if (TCUtil.lv(userBankcardSn) > 0) {
 					userBankcard = userBankcardService.getBySn(userBankcardSn);
-				}
-				if (userBankcard == null) {
-					userBankcard = userBankcardService.getByCardNo(userSn, cardNo);
-				}
-				if (userBankcard != null) {
-					userBankcard.setCardNo(cardNo);
-					userBankcard.setUserName(acctName);
-					userBankcard.setCertNo(idNo);
-					userBankcardService.update(userBankcard);
 				} else {
 					userBankcard = new PanoUserBankcardModel();
 					userBankcard.setUserSn(userSn);
@@ -303,7 +302,7 @@ public class PanoOrderController extends AbstractPanoController {
 				//组装连连支付报文
 				StringBuffer strBuf = new StringBuffer();
 				PaymentInfo payInfo = new PaymentInfo();
-				payInfo.setAcct_name(acctName);
+				payInfo.setAcct_name(userBankcard.getUserName());
 				strBuf.append("&acct_name=").append(payInfo.getAcct_name());
 				// 请求应用标识 1-Android 2-ios 3-WAP
 				payInfo.setApp_request("3");
@@ -313,14 +312,14 @@ public class PanoOrderController extends AbstractPanoController {
 				payInfo.setBusi_partner(LianAuthPayConfig.BUSI_PARTNER);
 				strBuf.append("&busi_partner=").append(payInfo.getBusi_partner());
 
-				payInfo.setCard_no(cardNo);
+				payInfo.setCard_no(userBankcard.getCardNo());
 				strBuf.append("&card_no=").append(payInfo.getCard_no());
 
 				// payInfo.setCard_no(request.getParameter("card_no"));
 				payInfo.setDt_order(DateUtil.getCurrentDateTimeStr1());
 				strBuf.append("&dt_order=").append(payInfo.getDt_order());
 
-				payInfo.setId_no(idNo);
+				payInfo.setId_no(userBankcard.getCertNo());
 				strBuf.append("&id_no=").append(payInfo.getId_no());
 				// 订单描述变(255)
 				// payInfo.setInfo_order(request.getParameter("info_order"));
@@ -328,7 +327,7 @@ public class PanoOrderController extends AbstractPanoController {
 				payInfo.setMoney_order(orderModel.getPayMoney().toString());
 				strBuf.append("&money_order=").append(payInfo.getMoney_order());
 				// 商品名称
-				payInfo.setName_goods("package");
+				payInfo.setName_goods("产品套餐");
 				strBuf.append("&name_goods=").append(payInfo.getName_goods());
 				// payInfo.setNo_agree(request.getParameter("no_agree"));签约协议号
 				// 商户唯一订单号
@@ -816,6 +815,10 @@ public class PanoOrderController extends AbstractPanoController {
 	public void lianpayReturn(HttpServletRequest request,
 			HttpServletResponse response, ModelMap map) throws Exception {
 		String resDataStr = request.getParameter("res_data");
+		if(StringUtils.isEmpty(resDataStr)){
+			response.sendRedirect("/order/orderspage");
+			return;
+		}
 		if (!YinTongUtil.checkSign(resDataStr, LianAuthPayConfig.PUB_KEY,
 				LianAuthPayConfig.MD5_KEY)) {
 

@@ -17,6 +17,25 @@ public class PanoUserBankcardModel extends PanoUserBankcard<PanoUserBankcardMode
 	private static final long serialVersionUID = 1L;
 
 	
-	
-
+	private String maskName;
+	private String maskCertNo;
+	private String maskCardNo;
+	public String getMaskName() {
+		return maskName;
+	}
+	public void setMaskName(String maskName) {
+		this.maskName = maskName;
+	}
+	public String getMaskCertNo() {
+		return maskCertNo;
+	}
+	public void setMaskCertNo(String maskCertNo) {
+		this.maskCertNo = maskCertNo;
+	}
+	public String getMaskCardNo() {
+		return maskCardNo;
+	}
+	public void setMaskCardNo(String maskCardNo) {
+		this.maskCardNo = maskCardNo;
+	}
 }

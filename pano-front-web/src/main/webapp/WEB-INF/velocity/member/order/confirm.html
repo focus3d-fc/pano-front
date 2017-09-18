@@ -25,8 +25,8 @@
 				<span class="fl">收货人：$!defaultAddress.userName</span> <span
 					class="fr">$!defaultAddress.mobile</span>
 			</p>
-			<p>收货地址：$!defaultAddress.province $!defaultAddress.province.city
-				$!defaultAddress.province.area $!defaultAddress.province.street</p>
+			<p>收货地址：$!defaultAddress.province $!defaultAddress.city
+				$!defaultAddress.area $!defaultAddress.street</p>
 		</div>
 		<a href="/personal/toaddress?packageSns=$!packageSns" class="right"><i style="font-size:.36rem;" class="iconfont">&#xe6c7;</i></a>
 	</section>
@@ -301,9 +301,7 @@ function choosePayScheme(paySchemeParam,ele){
     function couponcode_input(){
     	$($('[name=couponCode]').nextAll('span.square')).each(function(index,ele){
 			$(ele).text($('[name=couponCode]').val().charAt(index))        		
-	})
-	
-    	
+		});
     	if($('[name=couponCode]').val().length==6){
     		$('[name=couponCode]').blur();
     		$.ajax({

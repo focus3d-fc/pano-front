@@ -140,7 +140,7 @@
 
 <style>
  /*银行卡信息输入*/
-        .yanz{ width: 100%; background-color: #fff; padding: .3rem; position: fixed; bottom:0; height:3.2rem;}
+        .yanz{ width: 100%; background-color: #fff; padding: .3rem; position: fixed; bottom:0; height:4.0rem;}
         .yanz .row{ line-height: .4rem; border-bottom: 1px solid #eee; }
         .yanz .row img{width:.6rem;    height:.6rem; margin-right:.2rem;}
         .yanz .row i{ font-size: 0.4rem; vertical-align: middle; }
@@ -153,19 +153,22 @@
             <input hidden id="user_bankcard_sn" value="$!userBankcard.sn" /> 
                 <div class="row">
                 <img src="/images/1.png" alt="">
-                    <input class="new_row"  type="name" placeholder="请输入姓名" id="user_bankcard_username" value="$!userBankcard.userName">
+                    <input class="new_row"  type="name" placeholder="请输入姓名" id="user_bankcard_username" value="$!userBankcard.maskName">
                 </div>
                 <div class="row">
                 <img src="/images/38.png" alt="">
-                    <input class="new_row" type="sfz" placeholder="请输入身份证号" id="user_bankcard_certno" value="$!userBankcard.certNo">
+                    <input class="new_row" type="sfz" placeholder="请输入身份证号" id="user_bankcard_certno" value="$!userBankcard.maskCertNo">
                 </div>
                 <div class="row">
                 <img src="/images/34.png" alt="">
-                    <input class="new_row" type="yhk" placeholder="请输入银行卡号" id="user_bankcard_cartno" value="$!userBankcard.cardNo">
+                    <input class="new_row" type="yhk" placeholder="请输入银行卡号" id="user_bankcard_cartno" value="$!userBankcard.maskCardNo">
                 </div>
             </form>
+            <a id="deleteBankcard" style="padding: 5px 5px;line-height: 50px;background-color:black;color:white;border-radius:5px;">清除</a>
             <div style="height:50px;z-index:0"></div>
         </div>
     <input type="hidden" id="orderSn" value="$!order.sn"/>
     <input type="hidden" id="payMoney" value="$!order.payMoney"/>
     <input type="hidden" id="payType" value="LIANPAY_AUTH"/>
+    
+	<script src="/script/member/order/pay.js"></script>
