@@ -32,8 +32,8 @@
 				<span class="fl">收货人：$!order.address.userName</span> <span
 					class="fr">$!order.address.mobile</span>
 			</p>
-			<p>收货地址：$!order.address.province $!order.address.province.city
-				$!order.address.province.area $!order.address.province.street</p>
+			<p>收货地址：$!order.address.province $!order.address.city
+				$!order.address.area $!order.address.street</p>
 		</div>
 		<!-- <a href="/personal/toaddress?packageSns=$!packageSns" class="right"><i class="iconfont">&#xe6c7;</i></a> -->
 	</section>
@@ -153,12 +153,15 @@
           		 		<a class="tj" style="float:right;background-color:black;color:white;padding:3px 8px;border-radius:5px;display:inline-block;" onclick="location.href='/order/topaypage?order_sn=$!order.sn'">立即支付</a>
           		 	#end 
           		 	#if($!order.status==2 and $!order.childrenOrder.status==2) 
-          		 	<span style="float:right;">已支付</span>
+          		 	<span style="float:right;background-color:black;color:white;padding:3px 8px;border-radius:5px;display:inline-block;">已支付</span>
           		 	#end 
           		 	#if($!order.status==2 and $!order.childrenOrder.status==1) 
           		 		<span style="margin-top:5px;display:inline-block;">等待买家补齐尾款</span> <a class="tj" style="float:right;background-color:black;color:white;padding:3px 8px;border-radius:5px;display:inline-block;" onclick="location.href='/order/topaypage?order_sn=$!order.childrenOrder.sn'">立即补款</a>
           		 	#end
           		 #end 
+          		 
+          		 <a style="float:left;background-color:black;color:white;padding:3px 10px;border-radius:5px;display:inline-block;" href="/order/orderspage">返回</a>
+          		
        </div>
 
 </div>
@@ -198,21 +201,7 @@
 			$(this).attr("status", 0);
 		}
 	});
-        /* $('[name=couponCode]').input(function(event){ 
-        	if(value.length>6)
-        		value=value.slice(0,5)
-        	$($('[name=couponCode]').nextAll('span.square')).each(function(index,ele){
-        			$(ele).text($('[name=couponCode]').val().charAt(index))        		
-        	})
-        	
-        	if($('[name=couponCode]').val().length==6){
-        		$('[name=couponCode]').blur();
-        	}
-        	
-        	
-        	
-        }
-        ); */
+        
     })
    
 </script>

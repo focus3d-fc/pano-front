@@ -127,9 +127,13 @@ public class PanoOrderController extends AbstractPanoController {
 			map.put("userBankcard", userBankcards.get(0));
 		}
 		PanoOrderModel order = orderService.getOrderDetail(Long.parseLong(orderSn));
-
 		map.put("order", order);
-
+		String orderNum = order.getOrderNum();
+		PanoOrderModel parentOrder = order.getParentOrder();
+		if(parentOrder != null){
+			orderNum = parentOrder.getOrderNum();
+		}
+		map.put("orderNum", orderNum);
 		return "/member/order/pay";
 	}
 
@@ -255,8 +259,8 @@ public class PanoOrderController extends AbstractPanoController {
 				if (parentOrder.getStatus() != 2){
 					throw new RuntimeException("必须先完成定金支付，再支付尾款");
 				}
-				data.put("unPayedParentOrderSn", orderModel.getParentOrderSn());
 			}
+			//data.put("unPayedParentOrderSn", orderModel.getParentOrderSn().toString());
 			PanoMemUserModel panoMemUserModel = panoMemUserService.getBySn(orderModel.getUserSn());
 			// 根据支付类型组装相应参数
 			if ("LIANPAY_AUTH".equals(payType)) {
@@ -383,18 +387,21 @@ public class PanoOrderController extends AbstractPanoController {
 				configure.setKey(WxPayConfig.MCHKEY);
 				String attach = payType;
 				String openId = memLogin.getLoginName();
-				UnifiedOrderResData resData = WXPay
-						.requestUnifiedOrderService(
-								new UnifiedOrderReqData("body", out_trade_no,
-										orderModel.getPayMoney()
-												.multiply(new BigDecimal(100))
-												.setScale(0, RoundingMode.DOWN)
-												.intValue(),
-										getRemoteIp(request), notify_url,
-										"JSAPI", openId, attach, configure),
-								configure);
-				if (!resData.getIsSuccess())
+				//统一下单接口
+				UnifiedOrderReqData unifiedOrderReqData = new UnifiedOrderReqData(
+						"body", 
+						out_trade_no,
+						TCUtil.iv(PayUtils.convertYuan2Fen(orderModel.getPayMoney())),
+						getRemoteIp(request), 
+						notify_url,
+						"JSAPI", 
+						openId, 
+						attach, 
+						configure);
+				UnifiedOrderResData resData = WXPay.requestUnifiedOrderService(unifiedOrderReqData, configure);
+				if (!resData.getIsSuccess()){
 					throw new RuntimeException(resData.getWorkedMsg());
+				}
 				String timestamp = new Date().getTime() / 1000l + "";
 				data.put("appId", resData.getAppid());
 				data.put("package", "prepay_id=" + resData.getPrepay_id());
@@ -928,8 +935,10 @@ public class PanoOrderController extends AbstractPanoController {
 	 */
 	public void setCouponItemToUse(long orderSn){
 		PanoOrderCouponItemModel couponItemModel = panoOrderCouponItemService.getByOrderSn(orderSn);
-		couponItemModel.setCodeStatus(1);
-		panoOrderCouponItemService.update(couponItemModel);
+		if(couponItemModel != null){
+			couponItemModel.setCodeStatus(1);
+			panoOrderCouponItemService.update(couponItemModel);
+		}
 	}
 	
 	/**
@@ -943,15 +952,21 @@ public class PanoOrderController extends AbstractPanoController {
 		if(StringUtils.isNotEmpty(orderSn)){
 			long orderSnD = EncryptUtil.decode(orderSn);
 			PanoOrderModel order = orderService.getBySn(orderSnD);
+			String orderNum = order.getOrderNum();
 			if(order != null){
+				Long parentOrderSn = order.getParentOrderSn();
+				if(parentOrderSn != -1){
+					order = orderService.getOrderDetail(parentOrderSn);
+					orderNum = order.getOrderNum();
+				}
 				modelMap.put("order", order);
 			}
 			Long addressSn = order.getAddressSn();
 			PanoUserReceiveAddressModel address = receiveAddressService.getBySn(addressSn);
 			if(address != null){
 				modelMap.put("address", address);
-
 			}
+			modelMap.put("orderNum", orderNum);
 		}
 		return "/member/order/pay_complete";
 	}

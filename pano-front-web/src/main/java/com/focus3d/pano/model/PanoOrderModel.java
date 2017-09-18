@@ -21,6 +21,8 @@ public class PanoOrderModel extends PanoOrder<PanoOrderModel, PanoOrderCriteria>
 	private PanoOrderCouponItemModel couponItem;
 	//子订单
 	private PanoOrderModel childrenOrder;
+	
+	private PanoOrderModel parentOrder;
 
 	public PanoOrderModel getChildrenOrder() {
 		return childrenOrder;
@@ -108,5 +110,13 @@ public class PanoOrderModel extends PanoOrder<PanoOrderModel, PanoOrderCriteria>
 			return order.getSn().equals(this.getSn());
 		}
 		return false;
+	}
+
+	public PanoOrderModel getParentOrder() {
+		return parentOrder;
+	}
+
+	public void setParentOrder(PanoOrderModel parentOrder) {
+		this.parentOrder = parentOrder;
 	}
 }

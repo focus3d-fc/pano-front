@@ -97,6 +97,11 @@ public class PanoOrderServiceImpl extends CommonServiceImpl<PanoOrderModel> impl
 		if(childrenOrder != null){
 			order.setChildrenOrder(childrenOrder);
 		}
+		Long parentOrderSn = order.getParentOrderSn();
+		if(parentOrderSn != -1){
+			PanoOrderModel parentOrder = orderDao.getBySn(parentOrderSn);
+			order.setParentOrder(parentOrder);
+		}
 		order.setAddress(address);
 		order.setCouponItem(coupon);
 		List<PanoOrderPackageModel> orderPackages = orderPackageDao.listByOrder(orderSn);

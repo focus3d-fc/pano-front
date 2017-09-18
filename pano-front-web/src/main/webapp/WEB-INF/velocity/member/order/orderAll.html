@@ -63,7 +63,11 @@
 	    <div class="one_list"><h6 class="fl">$!orderGroupMap.get($!orderKey).project.name</h6></div>
 	    <div class="clearfix"></div>
 			#foreach($!order in $!orderGroupMap.get($!orderKey).orders)
-		    <div class="one_list"><span class="fl">订单号:$!order.orderNum </span><small class="fr">$!date.format("yyyy-MM-dd HH:mm:ss",$!order.orderTime)</small></div>
+		    <div class="one_list">
+		    <a href="/order/orderpage?order_sn=$!order.sn">
+		    <span class="fl">订单号:$!order.orderNum </span><small class="fr">$!date.format("yyyy-MM-dd HH:mm:ss",$!order.orderTime)</small>
+		    </a>
+		    </div>
 		    <div class="clearfix"></div>
 		    <div class="two_list">
 		    	<p class="fl">$!order.orderPackages.get(0).housePackage.style.name $!order.orderPackages.get(0).housePackage.house.name</p>
