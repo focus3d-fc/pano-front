@@ -290,6 +290,12 @@ public class PanoOrderController extends AbstractPanoController {
 				if (TCUtil.lv(userBankcardSn) > 0) {
 					userBankcard = userBankcardService.getBySn(userBankcardSn);
 				} else {
+					if(userBankcard == null){
+						userBankcard = userBankcardService.getByCardNo(userSn, cardNo);
+						if(userBankcard != null){
+							userBankcardService.delete(userBankcard);
+						}
+					}
 					userBankcard = new PanoUserBankcardModel();
 					userBankcard.setUserSn(userSn);
 					userBankcard.setCardNo(cardNo);
