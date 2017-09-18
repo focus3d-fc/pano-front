@@ -898,12 +898,12 @@ public class PanoOrderController extends AbstractPanoController {
 			if (!resData.getIsSuccess())
 				throw new RuntimeException(resData.getWorkedMsg());
 
-			//BigDecimal payAmount = new BigDecimal(Integer.parseInt(resData.getTotal_fee()) / 100d).setScale(2, RoundingMode.DOWN);
-			String payAmount = PayUtils.convertFen2Yuan(new BigDecimal(resData.getTotal_fee()));
 			PanoOrderModel orderModel = orderService.getOrderByNum(resData.getOut_trade_no());
+			String payAmount = PayUtils.convertFen2Yuan(new BigDecimal(resData.getTotal_fee()));
+			/*
 			if (!payAmount.equals(TCUtil.sv(orderModel.getPayMoney()))) {
 				throw new RuntimeException("支付金额不对");
-			}
+			}*/
 			if (orderModel.getStatus().compareTo(2) == 0) {
 				throw new RuntimeException("订单已经支付");
 			}
