@@ -13,7 +13,17 @@ $(function(){
 	});
 });
 (function($, doc, jquery) {
-		$.init();
+		$.init({
+			  gestureConfig:{
+				   tap: true, //默认为true
+				   doubletap: true, //默认为false
+				   longtap: true, //默认为false
+				   swipe: true, //默认为true
+				   drag: true, //默认为true
+				   hold:false,//默认为false，不监听
+				   release:false//默认为false，不监听
+				  }
+				});
 		$.ready(function() {
 			var _getParam = function(obj, param) {
 				return obj[param] || '';
@@ -29,11 +39,28 @@ $(function(){
 			var projectResultValue = doc.getElementById('projectResultValue');
 			var formObj = jquery("form");
 			showProjectPickerButton.addEventListener('tap', function(event) {
+				if(jQuery("#projectName")){
+					jQuery("#projectName").remove();
+				}
+				var items = userPicker.getSelectedItems();
+				var projectName = _getParam(items[3], 'text');
+				jQuery("<div id='projectName'>" + projectName + "</div>").insertAfter(jQuery(".mui-poppicker-btn-cancel"));
+				
 				userPicker.show(function(items) {
 					projectResultValue.value = _getParam(items[3], 'value');
 					formObj.submit();
 				});
 			}, false);
+			
+			
+			doc.addEventListener('swipe', function(event) {
+				if(jQuery("#projectName")){
+					jQuery("#projectName").remove();
+				}
+				var items = userPicker.getSelectedItems();
+				var projectName = _getParam(items[3], 'text');
+				jQuery("<div id='projectName'>" + projectName + "</div>").insertAfter(jQuery(".mui-poppicker-btn-cancel"));
+			});
 		});
 	})(mui, document, jQuery);
 	
