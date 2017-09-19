@@ -23,9 +23,9 @@ public class SmsSendClient {
 	 */
 	public static final String charset = "utf-8";
 	// 用户平台API账号(非登录账号,示例:N1234567)
-	public static String account = "N7630417";
+	public static String account = "N2792621";
 	// 用户平台API密码(非登录密码)
-	public static String pswd = "0LPYw2b5uc84a9";
+	public static String pswd = "bA88tzx6h";
 	//请求地址请登录253云通讯自助通平台查看或者询问您的商务负责人获取
 	public String smsSingleRequestServerUrl = "http://smssh1.253.com/msg/send/json";
 	
