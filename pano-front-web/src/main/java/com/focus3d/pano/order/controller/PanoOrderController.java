@@ -1005,4 +1005,5 @@ public class PanoOrderController extends AbstractPanoController {
 	public static String generateOrderNum() {
 		return new SimpleDateFormat("yyyyMMDDHHmmss").format(new Date())+RandomStringUtils.randomNumeric(4);
 	}
+
 }

@@ -41,7 +41,7 @@ public class SmsController extends BaseController {
 
 	private Lock lock = new ReentrantLock();
 
-	private static final int SMS_SEND_LIMIT_PER_DAY = 50;
+	private static final int SMS_SEND_LIMIT_PER_DAY = 20;
 	/**
 	 * 发送短信
 	 * *

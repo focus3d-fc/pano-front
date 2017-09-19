@@ -138,7 +138,7 @@
 			</div>
 			<div class="row">
 				<i class=" iconfont">&#xe66f;</i> <input class="noline" type="text"
-					placeholder="验证码" name="verifycode"> <span
+					placeholder="验证码" id="verifycode" name="verifycode"> <span
 					id="j_getVerifyCode" class="new_yzm">获取验证码</span>
 			</div>
 			<button id="validateOrder" type="button">立即验证</button>
@@ -365,9 +365,9 @@ function choosePayScheme(paySchemeParam,ele){
    }
    
    function create_order(){
-	   	var status = $(this).attr("status");
+	   	var status = $("#submitOrder").attr("status");
 	   	if(!status){
-	   		$(this).attr("status", "1");
+	   		$("#submitOrder").attr("status", "1");
 	   	} else {
 	   		return;
 	   	}
@@ -406,6 +406,9 @@ function choosePayScheme(paySchemeParam,ele){
 	            success: function (data) {
 	            	if(data.status != 0){
 	            		alert(data.statusMsg)
+	            		$("#submitOrder").removeAttr("status");
+	            		$("#j_phone").val("");
+	            		$("#verifycode").val("");
 	            		return;
 	            	}else{
 	            		window.location.href='/order/topaypage?order_sn='+data.orderSn;
