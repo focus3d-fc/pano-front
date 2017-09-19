@@ -128,7 +128,9 @@
 			var rate = 4 / 3;
 			var width = WebGL_Container.width();
 			var height = parseInt(width / rate);
+			
 			WebGL_Container.height(height);
+			$("#wait").width(width).height(height);
 
 			WebGL.init(width, height);
 			scaler = width / 800.0;

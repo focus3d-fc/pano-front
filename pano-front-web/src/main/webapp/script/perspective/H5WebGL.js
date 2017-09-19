@@ -54,7 +54,7 @@ var WebGL = {
 
         this.root = new THREE.Object3D();
         this.wait = $("#wait");
-        this.wait.width(width).height(height);
+        
         scene.add(this.root);
         // scene.scale.set(scaler,scaler,1);
         this.root.position.set(0,0,0);
