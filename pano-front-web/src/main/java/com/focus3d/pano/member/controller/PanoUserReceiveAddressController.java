@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.config.BaseConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,7 +13,6 @@ import com.focus3d.pano.common.controller.BaseController;
 import com.focus3d.pano.filter.LoginThreadLocal;
 import com.focus3d.pano.member.service.PanoUserReceiveAddressService;
 import com.focus3d.pano.model.PanoUserReceiveAddressModel;
-import com.focustech.common.utils.TCUtil;
 
 /**
  * 

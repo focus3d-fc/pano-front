@@ -7,7 +7,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -107,7 +106,8 @@ public class PersonalController extends BaseController {
 	public String delSite(HttpServletRequest request) {
 		Long SN = Long.parseLong(request.getParameter("SN"));
 		personalService.delAddress(SN);
-		return redirect("toaddress2");
+		String packageSns = HttpUtil.sv(request, "packageSns");
+		return redirect("toaddress2?packageSns=" + packageSns);
 	}
 
 	/**
@@ -145,6 +145,12 @@ public class PersonalController extends BaseController {
 		receiveAddressModel.setDefaultFirst(ListUtils.isEmpty(receiveAddressList) ? 1 : 0);
 		receiveAddressService.insert(receiveAddressModel);
 		String packageSns = HttpUtil.sv(request, "packageSns");
+		List<PanoUserReceiveAddressModel> addressCount = receiveAddressService.listByUser(userSn);
+		if(ListUtils.isNotEmpty(addressCount) && addressCount.size() == 1){
+			if(StringUtils.isNotEmpty(packageSns)){
+				return redirect("/order/confirmpage?packageSns=" + packageSns);
+			}
+		}
 		return redirect("toaddress2" + (StringUtils.isEmpty(packageSns) ? "" :  "?packageSns=" + packageSns));
 	}
 
@@ -152,9 +158,11 @@ public class PersonalController extends BaseController {
 	 * 进入到编辑地址
 	 */
 	@RequestMapping("/toupAddress")
-	public String toupAddress(String SN, ModelMap modelMap) {
+	public String toupAddress(String SN, ModelMap modelMap, HttpServletRequest request) {
+		String packageSns = HttpUtil.sv(request, "packageSns");
 		PanoUserReceiveAddressModel address = receiveAddressService.getBySn(TCUtil.lv(SN));
 		modelMap.put("address", address);
+		modelMap.put("packageSns", packageSns);
 		return "/userside/upaddress";
 	}
 
@@ -165,8 +173,9 @@ public class PersonalController extends BaseController {
 	public String upSite(HttpServletRequest request,
 			@RequestParam String USER_NAME, @RequestParam String MOBILE,
 			@RequestParam String cityResult3, @RequestParam String STREET,
-			@RequestParam String SN) {
-
+			@RequestParam String SN, @RequestParam String packageSns) {
+		
+		
 		pano_user_receive_address site = new pano_user_receive_address();
 		site.setUSER_NAME(USER_NAME);
 		site.setMOBILE(MOBILE);
@@ -188,7 +197,7 @@ public class PersonalController extends BaseController {
 		String add_time = sdf.format(date);
 		site.setUPDATE_TIME(add_time);
 		personalService.upAddress(site);
-		return redirect("toaddress2");
+		return redirect("toaddress2?packageSns=" + TCUtil.sv(packageSns));
 	}
 
 	/**

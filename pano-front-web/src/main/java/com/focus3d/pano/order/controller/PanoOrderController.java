@@ -188,6 +188,7 @@ public class PanoOrderController extends AbstractPanoController {
 		modelMap.put("payAmount", payAmount);
 		PanoMemUserModel memUser = panoMemUserService.getBySn(userSn);
 		modelMap.put("regMobile", com.focustech.common.utils.StringUtils.isNotEmpty(memUser.getMobile()));
+		modelMap.put("packageSns", packageSnsParam);
 		return "/member/order/confirm";
 	}
 
