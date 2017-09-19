@@ -26,6 +26,8 @@ var view_index = 0;
 var element_product;
 var element_user_product;
 
+var loading_texture;
+
 var WebGL = {
     scene:{},
     root:null,
@@ -35,6 +37,7 @@ var WebGL = {
     parent:{},
     INTERSECTED:null,
     pre_pos:null,
+    wait:null,
     render:function(){
         requestAnimationFrame(WebGL.render);
         webGLRenderer.render(scene, camera);
@@ -50,6 +53,7 @@ var WebGL = {
         scene.add(camera);
 
         this.root = new THREE.Object3D();
+        this.wait = $("#wait");
         scene.add(this.root);
         // scene.scale.set(scaler,scaler,1);
         this.root.position.set(0,0,0);
@@ -80,6 +84,9 @@ var WebGL = {
         webGLRenderer.domElement.addEventListener('mouseup',this.onmouseup,false);
 
         this.render();
+    },
+    exhibitionWait:function(){
+    	this.wait.show();
     },
     onmousemove:function(event){
         event.preventDefault();
@@ -139,12 +146,19 @@ var WebGL = {
         this.INTERSECTED = null;
         this.pre_pos = null;
     },
-    load_texture:function(url){
-        var _texture = THREE.ImageUtils.loadTexture(url);
+    load_texture:function(id,url){
+        var _texture = THREE.ImageUtils.loadTexture(url,THREE.UVMapping,function(){
+        	if(loading_texture.hasOwnProperty(id)){
+        		delete loading_texture[id];
+        	}
+        	if( Object.keys(loading_texture).length == 0){
+        		WebGL.wait.hide();
+        	}
+        });
         return _texture;
     },
     createView:function (parent,data){
-        var _texture = this.load_texture(data.url);
+        var _texture = this.load_texture(data.id,data.url);
         var _plane = new THREE.PlaneGeometry(1,1,1,1);
         var _mat = new THREE.MeshLambertMaterial({map:_texture,transparent:true});
         var mesh = new THREE.Mesh(_plane,_mat);
@@ -179,7 +193,7 @@ var WebGL = {
 
         var _mat;
         if(data.url){
-            var _texture = this.load_texture(data.url);
+            var _texture = this.load_texture(data.elementId,data.url);
             _mat = new THREE.MeshLambertMaterial({map:_texture,transparent:true});
         }else{
             _mat = new THREE.MeshLambertMaterial({transparent:true});
@@ -222,7 +236,7 @@ var WebGL = {
     reLoadElement:function(element,data){
         var _texture;
         if(data.url){
-            _texture = this.load_texture(data.url);
+            _texture = this.load_texture(data.elementId,data.url);
             element.material.map = _texture;
         }
 
@@ -444,7 +458,7 @@ function CaculateSpace(data){
         	var view_list = new Array();
         	for(var i=0,len=productView.length;i<len;i++){
     			var key = productView[i].viewId;
-    			if(data.view.hasOwnProperty[key]){
+    			if(data.view.hasOwnProperty(key)){
     				view_list.push(data.view[key].id);
     			}
     		}
@@ -543,6 +557,8 @@ function QueryPerspectiveDetail(viewKey){
 }
 
 function CreatePerspective(data){
+	loading_texture = new Object();
+	WebGL.exhibitionWait();
 	WebGL.clearScene();
 	element_user_product = new Object();
 	element_product = new Object();
@@ -559,6 +575,7 @@ function CreatePerspective(data){
             layer_map = view.layer;
         }else{
        	 	var view_data = new Object();
+       	 	loading_texture[_data.viewId] = true;
             view_data.id = _data.viewId;
             view_data.name = _data.viewName;
             view_data.mapid = _data.viewMapId;
@@ -574,7 +591,6 @@ function CreatePerspective(data){
             layer_map = new Object();
             view.layer = layer_map;
         }
-        
         for(var j=0;j<productView.length;j++){
         	if(productView[j].viewId == _data.viewId){
         		exhibition_product = productView[j].elementId;
@@ -603,6 +619,7 @@ function CreatePerspective(data){
             		random_elementId =  _data.elementId;
             	}
            	 	var element_data = new Object();
+           	 	loading_texture[_data.elementId] = true;
                 element_data.elementId = _data.elementId;
                 element_data.productId = _data.productId;
                 element_data.elementName = _data.elementName;
