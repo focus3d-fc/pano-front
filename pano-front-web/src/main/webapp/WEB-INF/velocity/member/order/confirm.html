@@ -18,6 +18,7 @@
 </style>
 <div class="container confirm">
 	<!--列表头-->
+	<a href="/personal/toaddress?packageSns=$!packageSns" class="right">
 	<section class="address add-img" >
 		<img  class="img_b0"  src="/images/8.png" alt="" >
 		<div class="w-pre90" style="width:100%;">
@@ -28,8 +29,9 @@
 			<p>收货地址：$!defaultAddress.province $!defaultAddress.city
 				$!defaultAddress.area $!defaultAddress.street</p>
 		</div>
-		<a href="/personal/toaddress?packageSns=$!packageSns" class="right"><i style="font-size:.36rem;" class="iconfont">&#xe6c7;</i></a>
+		<i style="font-size:.36rem;" class="iconfont">&#xe6c7;</i>
 	</section>
+	</a>
 	<!--订单-->
 	<div class="one_list"><h6 class="fl">$!shopcartList.get(0).housePackage.project.name</h6></div>
 	<div class="clearfix"></div>

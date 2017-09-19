@@ -13,7 +13,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.focus3d.pano.common.controller.BaseController;
 import com.focus3d.pano.filter.LoginThreadLocal;
 import com.focus3d.pano.member.service.PanoUserReceiveAddressService;
 import com.focus3d.pano.model.OrderRelevance;
@@ -22,6 +21,7 @@ import com.focus3d.pano.model.PanoUserReceiveAddressModel;
 import com.focus3d.pano.model.pano_mem_user;
 import com.focus3d.pano.model.pano_order;
 import com.focus3d.pano.model.pano_user_receive_address;
+import com.focus3d.pano.pub.controller.AbstractPanoController;
 import com.focus3d.pano.user.service.PanoMemUserService;
 import com.focus3d.pano.usersside.service.PersonalService;
 import com.focustech.common.utils.HttpUtil;
@@ -37,7 +37,7 @@ import com.focustech.common.utils.TCUtil;
  */
 @Controller
 @RequestMapping("/personal")
-public class PersonalController extends BaseController {
+public class PersonalController extends AbstractPanoController {
 
 	@Autowired
 	private PersonalService personalService;

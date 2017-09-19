@@ -153,8 +153,8 @@
     <div style="height:1.1rem;"></div>
  
     <nav class="nav">
-        <a href="javascript:void(0)">
-            <img id="toIndex" style="width:.65rem;height:.65rem;filter:Invert();" src="$!fs.url($!{img_home})" alt="">
+        <a href="/index" style="display: block;width: .65rem;float: right;">
+            <img  style="width:.65rem;height:.65rem;filter:Invert();" src="$!fs.url($!{img_home})" alt="">
             <p style="color: black;">首页</p>
         </a>
     </nav>
@@ -187,10 +187,6 @@ $(function(){
 			var orderSn = $(this).attr("order_sn");
 			window.location.href = "/order/cancel?order_sn=" + orderSn;
 		}
-	})
-	
-	$("#toIndex").click(function(){
-		window.location.href = "/index";
 	});
 });
 </script>
