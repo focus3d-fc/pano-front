@@ -462,7 +462,7 @@
             ON view.`SN` = layer.view_sn 
           INNER JOIN pano_perspective_element element 
             ON layer.sn = element.layer_sn 
-            AND element.package_type_sn = 10170 
+            AND element.package_type_sn = #PACKAGE_TYPE_SN#
         WHERE view.`HOUSE_STYLE_SN` = #HOUSE_STYLE_SN#
 	</select>
 	
