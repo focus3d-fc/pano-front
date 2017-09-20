@@ -352,9 +352,13 @@ public class PanoOrderController extends AbstractPanoController {
 				// payInfo.setAcct_name(request.getParameter("acct_name"));
 				// 风险控制参数
 				JSONObject riskItem = new JSONObject();
-				riskItem.put("frms_ware_category", "4001");
-				riskItem.put("user_info_mercht_userno", orderModel.getUserSn() + "");
-				riskItem.put("user_info_dt_register", DateUtil.getCurrentDateTimeStr1(panoMemUserModel.getAddTime()));
+				riskItem.put("frms_ware_category", "2031");//产品类目
+				riskItem.put("user_info_mercht_userno", TCUtil.sv(orderModel.getUserSn()));//平台用户id
+				riskItem.put("user_info_dt_register", DateUtil.getCurrentDateTimeStr1(panoMemUserModel.getAddTime()));//平台用户注册时间
+				riskItem.put("user_info_bind_phone", TCUtil.sv(panoMemUserModel.getMobile()));//平台用户绑定的手机号
+				riskItem.put("user_info_full_name", userBankcard.getUserName());//平台用户实名
+				riskItem.put("user_info_id_no", userBankcard.getCertNo());//平台用户身份证号
+				riskItem.put("user_info_identify_state", 0);//是否实名
 				payInfo.setRisk_item(riskItem.toJSONString());
 				strBuf.append("&risk_item=").append(payInfo.getRisk_item());
 
