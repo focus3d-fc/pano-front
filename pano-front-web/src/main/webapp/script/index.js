@@ -6,6 +6,13 @@ $(function(){
 		pagination: '.swiper-pagination',
 	})
 	
+	$("a[id^='ad_']").click(function(){
+		var lk = $(this).attr("lk");
+		if(lk){
+			window.location.href = lk;
+		}
+	});
+	
 	$(document).click(function(e){
 		if(e.target.id != "showProjectPicker"){
 			userPicker.hide();

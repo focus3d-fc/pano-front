@@ -32,7 +32,7 @@
         <div class="swiper-container">
             <div class="swiper-wrapper"><!-- http://   about.html-->
                 #foreach ($!{ad} in $!{adList})
-                <a href="$!{ad.LINK}" class="swiper-slide">
+                <a id="ad_$!velocityCount" lk="$!{ad.LINK}" href="javascript:void(0)" class="swiper-slide">
                     <img id="dtli" src="$!fs.url($!ad.IMG_SN)">
                 </a>
                 #end

@@ -41,6 +41,7 @@ import com.focus3d.pano.model.PanoMemLoginModel;
 import com.focus3d.pano.model.PanoMemUserModel;
 import com.focus3d.pano.model.PanoOrderCouponItemModel;
 import com.focus3d.pano.model.PanoOrderCouponModel;
+import com.focus3d.pano.model.PanoOrderLogtcModel;
 import com.focus3d.pano.model.PanoOrderModel;
 import com.focus3d.pano.model.PanoOrderPackageDetailModel;
 import com.focus3d.pano.model.PanoOrderPackageModel;
@@ -55,6 +56,7 @@ import com.focus3d.pano.model.PanoValidateModel;
 import com.focus3d.pano.order.pay.config.LianAuthPayConfig;
 import com.focus3d.pano.order.pay.config.WxPayConfig;
 import com.focus3d.pano.order.service.PanoOrderCouponItemService;
+import com.focus3d.pano.order.service.PanoOrderLogtcService;
 import com.focus3d.pano.order.service.PanoOrderPackageDetailService;
 import com.focus3d.pano.order.service.PanoOrderPackageService;
 import com.focus3d.pano.order.service.PanoOrderService;
@@ -111,6 +113,9 @@ public class PanoOrderController extends AbstractPanoController {
 	private PanoOrderShopCartService<PanoOrderShopcartModel> shopCartService;
 	@Autowired
 	private PanoUserBankcardService<PanoUserBankcardModel> userBankcardService;
+	@Autowired
+	private PanoOrderLogtcService<PanoOrderLogtcModel> orderLogtcService;
+
 	/**
 	 * 跳转到支付页面
 	 * @param request
@@ -513,13 +518,14 @@ public class PanoOrderController extends AbstractPanoController {
 				discountAmount = cp.getPriceDiscount().floatValue();
 				dueAmount = dueAmount - discountAmount;
 			}
-
 			// 分支付方案处理
 			PanoOrderModel orderModel = null;
+			//优惠
+			double discount = 1.00D;
 			if ("FULL".equals(payScheme)) {
+				discount = 0.95D;
 				// 全款支付
 				payAmount = dueAmount * 0.95f;
-
 				orderModel = new PanoOrderModel();
 				orderModel.setOrderNum(generateOrderNum());
 				orderModel.setOrderTime(new Date());
@@ -533,15 +539,13 @@ public class PanoOrderController extends AbstractPanoController {
 				orderModel.setLeftPay(0);
 				orderModel.setAgreeClause(1);
 				orderModel.setParentOrderSn(-1l);
+				orderModel.setDiscount(new BigDecimal(discount));
 				orderService.insert(orderModel);
-
 			} else if ("STAGES".equals(payScheme)) {
 				// 分期付款
 				float stage1Amount = dueAmount * 0.2f;
 				float stage2Amount = dueAmount - stage1Amount;
-
 				payAmount = stage1Amount;
-
 				orderModel = new PanoOrderModel();
 				orderModel.setOrderNum(generateOrderNum());
 				orderModel.setOrderTime(new Date());
@@ -555,12 +559,11 @@ public class PanoOrderController extends AbstractPanoController {
 				orderModel.setLeftPay(1);
 				orderModel.setAgreeClause(1);
 				orderModel.setParentOrderSn(-1l);
+				orderModel.setDiscount(new BigDecimal(discount));
 				orderService.insert(orderModel);
-
 				//子订单
 				PanoOrderModel stage2OrderModel = new PanoOrderModel();
-				stage2OrderModel
-						.setOrderNum(generateOrderNum());
+				stage2OrderModel.setOrderNum(generateOrderNum());
 				stage2OrderModel.setOrderTime(new Date());
 				stage2OrderModel.setStatus(1);
 				stage2OrderModel.setAddressSn(addressSn);
@@ -572,6 +575,7 @@ public class PanoOrderController extends AbstractPanoController {
 				stage2OrderModel.setLeftPay(0);
 				stage2OrderModel.setAgreeClause(1);
 				stage2OrderModel.setParentOrderSn(orderModel.getSn());
+				stage2OrderModel.setDiscount(new BigDecimal(discount));
 				orderService.insert(stage2OrderModel);
 			} else {
 				throw new RuntimeException("不支持的支付方案");
@@ -582,36 +586,27 @@ public class PanoOrderController extends AbstractPanoController {
 				coupon.setOrderSn(orderModel.getSn());
 				panoOrderCouponItemService.update(coupon);
 			}
+			//保存物流信息
+			saveOrderLogtcInfo(orderModel);
 			// 保存订单中的套餐信息
 			for (int i = 0; i < packages.size(); i++) {
 				PanoOrderPackageModel orderPackageModel = new PanoOrderPackageModel();
 				orderPackageModel.setOrderSn(orderModel.getSn());
 				orderPackageModel.setHousePackageSn(packages.get(i).getSn());
-				orderPackageModel.setPurchaseNum(Integer
-						.parseInt(packageCounts[i]));
+				orderPackageModel.setPurchaseNum(Integer.parseInt(packageCounts[i]));
 				orderPackageModel.setPrice(packages.get(i).getPackagePrice());
 				panoOrderPackageService.insert(orderPackageModel);
-
-				PanoOrderShopcartModel shopcart = shopCartService
-						.getUserShopcartPackage(userSn, packages.get(i).getSn());
+				PanoOrderShopcartModel shopcart = shopCartService.getUserShopcartPackage(userSn, packages.get(i).getSn());
 				if (shopcart != null) {
-					for (PanoOrderShopcartDetailModel shopcartPackageDetail : shopcart
-							.getDetails()) {
+					for (PanoOrderShopcartDetailModel shopcartPackageDetail : shopcart.getDetails()) {
 						PanoOrderPackageDetailModel orderPackageDetailModel = new PanoOrderPackageDetailModel();
-						orderPackageDetailModel
-								.setOrderPackageSn(orderPackageModel.getSn());
-						orderPackageDetailModel
-								.setPackageTypeSn(shopcartPackageDetail
-										.getPackageTypeSn());
-						orderPackageDetailModel
-								.setPackageProductSn(shopcartPackageDetail
-										.getPackageProductSn());
-						panoOrderPackageDetailService
-								.insert(orderPackageDetailModel);
+						orderPackageDetailModel.setOrderPackageSn(orderPackageModel.getSn());
+						orderPackageDetailModel.setPackageTypeSn(shopcartPackageDetail.getPackageTypeSn());
+						orderPackageDetailModel.setPackageProductSn(shopcartPackageDetail.getPackageProductSn());
+						panoOrderPackageDetailService.insert(orderPackageDetailModel);
 					}
 				}
 			}
-
 			data.put("status", 0);
 			data.put("orderSn", orderModel.getSn());
 
@@ -622,6 +617,34 @@ public class PanoOrderController extends AbstractPanoController {
 		}
 
 		ajaxOutput(response, data.toString());
+	}
+	/**
+	 * 保存订单物流信息
+	 * *
+	 * @param orderModel
+	 */
+	private void saveOrderLogtcInfo(PanoOrderModel orderModel) {
+		Long orderSn = orderModel.getSn();
+		int type = 1;//物流类型 1-快递 2-物流
+		int send = 0;//是否发货 0-未发货 1-发货
+		int receive = 0;//是否已经收到货 0-未收货 1-已收货
+		Long addressSn = orderModel.getAddressSn();
+		PanoUserReceiveAddressModel userReceiveAddressModel = receiveAddressService.getBySn(addressSn);
+		String userName = userReceiveAddressModel.getUserName();
+		String mobile = userReceiveAddressModel.getMobile();
+		String province = TCUtil.sv(userReceiveAddressModel.getProvince());
+		String city = TCUtil.sv(userReceiveAddressModel.getCity());
+		String area = TCUtil.sv(userReceiveAddressModel.getArea());
+		String street = TCUtil.sv(userReceiveAddressModel.getStreet());
+		PanoOrderLogtcModel orderLogtcModel = new PanoOrderLogtcModel();
+		orderLogtcModel.setType(type);
+		orderLogtcModel.setSend(send);
+		orderLogtcModel.setReceive(receive);
+		orderLogtcModel.setUserName(userName);
+		orderLogtcModel.setUserPhone(mobile);
+		orderLogtcModel.setOrderSn(orderSn);
+		orderLogtcModel.setUserAddress(province + " " + city + " " + area + " " + street);
+	    orderLogtcService.insert(orderLogtcModel);
 	}
 
 	/**
@@ -731,8 +754,7 @@ public class PanoOrderController extends AbstractPanoController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/lianpaynotify")
-	public void lianpayNotify(HttpServletRequest req, HttpServletResponse resp,
-			ModelMap map) throws Exception {
+	public void lianpayNotify(HttpServletRequest req, HttpServletResponse resp, ModelMap map) throws Exception {
 		resp.setCharacterEncoding("UTF-8");
 		System.out.println("进入支付异步通知数据接收处理");
 		RetBean retBean = new RetBean();
@@ -747,8 +769,7 @@ public class PanoOrderController extends AbstractPanoController {
 		}
 		System.out.println("接收支付异步通知数据：【" + reqStr + "】");
 		try {
-			if (!YinTongUtil.checkSign(reqStr, LianAuthPayConfig.PUB_KEY,
-					LianAuthPayConfig.MD5_KEY)) {
+			if (!YinTongUtil.checkSign(reqStr, LianAuthPayConfig.PUB_KEY, LianAuthPayConfig.MD5_KEY)) {
 				retBean.setRet_code("9999");
 				retBean.setRet_msg("交易失败");
 				resp.getWriter().write(JSON.toJSONString(retBean));
@@ -764,15 +785,12 @@ public class PanoOrderController extends AbstractPanoController {
 			resp.getWriter().flush();
 			return;
 		}
-
 		// 解析异步通知对象
 		try {
-			PayDataBean payDataBean = JSON.parseObject(reqStr,
-					PayDataBean.class);
+			PayDataBean payDataBean = JSON.parseObject(reqStr, PayDataBean.class);
 			if ("SUCCESS".equals(payDataBean.getResult_pay())) {
-				BigDecimal payAmount = new BigDecimal(
-						payDataBean.getMoney_order());
-				long orderSn = Long.parseLong(payDataBean.getNo_order());
+				BigDecimal payAmount = new BigDecimal(payDataBean.getMoney_order());
+				long orderId = Long.parseLong(payDataBean.getNo_order());
 				String orderNum = payDataBean.getNo_order();
 				PanoOrderModel orderModel = orderService.getOrderByNum(orderNum);
 				if(orderModel == null){
@@ -788,22 +806,20 @@ public class PanoOrderController extends AbstractPanoController {
 					resp.getWriter().flush();
 					return;
 				}
-				orderModel.setStatus(2);
-				orderService.update(orderModel);
-
+				updateOrderWhenNotify(orderModel);
+				//保存交易记录
 				PanoOrderTransModel orderTransModel = new PanoOrderTransModel();
-				orderTransModel.setOrderId(orderSn + "");
+				orderTransModel.setOrderId(TCUtil.sv(orderId));
 				orderTransModel.setTransDate(new Date());
 				orderTransModel.setTransType("001");
-				orderTransModel.setTransPlatformType(1);
+				orderTransModel.setTransPlatformType(2);
 				orderTransModel.setTransMoney(payAmount);
 				orderTransModel.setTransId(orderNum);
 				orderTransModel.setTransStatus("SUCCESS");
 				panoOrderTransService.insert(orderTransModel);
-				//优惠券使用
-				setCouponItemToUse(orderSn);
+				//标记优惠券使用
+				updateCouponItem2Use(orderModel.getSn());
 			}
-
 			retBean.setRet_code("0000");
 			retBean.setRet_msg("交易成功");
 			resp.getWriter().write(JSON.toJSONString(retBean));
@@ -819,7 +835,22 @@ public class PanoOrderController extends AbstractPanoController {
 		
 		return;
 	}
-
+	/**
+	 * 
+	 * *
+	 * @param orderModel
+	 */
+	private void updateOrderWhenNotify(PanoOrderModel orderModel) {
+		orderModel.setStatus(2);
+		Long parentOrderSn = orderModel.getParentOrderSn();
+		if(parentOrderSn != -1){
+			PanoOrderModel parentOrder = orderService.getBySn(parentOrderSn);
+			parentOrder.setLeftMoney(new BigDecimal(0));
+			parentOrder.setLeftPay(0);
+			orderService.update(parentOrder);
+		}
+		orderService.update(orderModel);
+	}
 	/**
 	 * 连连支付同步回调
 	 * @param request
@@ -828,15 +859,13 @@ public class PanoOrderController extends AbstractPanoController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/lianpayreturn")
-	public void lianpayReturn(HttpServletRequest request,
-			HttpServletResponse response, ModelMap map) throws Exception {
+	public void lianpayReturn(HttpServletRequest request,HttpServletResponse response, ModelMap map) throws Exception {
 		String resDataStr = request.getParameter("res_data");
 		if(StringUtils.isEmpty(resDataStr)){
 			response.sendRedirect("/order/orderspage");
 			return;
 		}
-		if (!YinTongUtil.checkSign(resDataStr, LianAuthPayConfig.PUB_KEY,
-				LianAuthPayConfig.MD5_KEY)) {
+		if (!YinTongUtil.checkSign(resDataStr, LianAuthPayConfig.PUB_KEY, LianAuthPayConfig.MD5_KEY)) {
 
 		}
 		JSONObject resData = JSON.parseObject(resDataStr);
@@ -853,9 +882,8 @@ public class PanoOrderController extends AbstractPanoController {
 				throw new RuntimeException("支付金额不对");
 			} else {
 				if (orderModel.getStatus().compareTo(1) == 0) {
-					orderModel.setStatus(2);
-					orderService.update(orderModel);
-
+					updateOrderWhenNotify(orderModel);
+					
 					PanoOrderTransModel orderTransModel = new PanoOrderTransModel();
 					orderTransModel.setOrderId(noOrder);
 					orderTransModel.setTransDate(new Date());
@@ -912,8 +940,7 @@ public class PanoOrderController extends AbstractPanoController {
 			if (orderModel.getStatus().compareTo(2) == 0) {
 				throw new RuntimeException("订单已经支付");
 			}
-			orderModel.setStatus(2);
-			orderService.update(orderModel);
+			updateOrderWhenNotify(orderModel);
 
 			PanoOrderTransModel orderTransModel = new PanoOrderTransModel();
 			orderTransModel.setOrderId(resData.getOut_trade_no());
@@ -925,7 +952,7 @@ public class PanoOrderController extends AbstractPanoController {
 			orderTransModel.setTransStatus("SUCCESS");
 			panoOrderTransService.insert(orderTransModel);
 			//优惠券使用
-			setCouponItemToUse(orderModel.getSn());
+			updateCouponItem2Use(orderModel.getSn());
 			response.getWriter()
 					.write("<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
 		} catch (Exception e) {
@@ -952,7 +979,7 @@ public class PanoOrderController extends AbstractPanoController {
 	 * *
 	 * @param orderSn
 	 */
-	public void setCouponItemToUse(long orderSn){
+	public void updateCouponItem2Use(long orderSn){
 		PanoOrderCouponItemModel couponItemModel = panoOrderCouponItemService.getByOrderSn(orderSn);
 		if(couponItemModel != null){
 			couponItemModel.setCodeStatus(1);

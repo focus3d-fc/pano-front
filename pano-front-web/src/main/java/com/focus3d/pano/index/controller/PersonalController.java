@@ -105,7 +105,9 @@ public class PersonalController extends AbstractPanoController {
 	@RequestMapping("/delSite")
 	public String delSite(HttpServletRequest request) {
 		Long SN = Long.parseLong(request.getParameter("SN"));
-		personalService.delAddress(SN);
+		PanoUserReceiveAddressModel userReceiveAddressModel = receiveAddressService.getBySn(SN);
+		userReceiveAddressModel.setStatus(0);
+		receiveAddressService.update(userReceiveAddressModel);
 		String packageSns = HttpUtil.sv(request, "packageSns");
 		return redirect("toaddress2?packageSns=" + packageSns);
 	}
@@ -139,6 +141,7 @@ public class PersonalController extends AbstractPanoController {
 		receiveAddressModel.setArea(TCUtil.sv(arrCp[2]));
 		receiveAddressModel.setStreet(STREET);
 		receiveAddressModel.setUserSn(userSn);
+		receiveAddressModel.setStatus(1);
 		PanoMemUserModel memuser = memUserService.getBySn(userSn);
 		receiveAddressModel.setSex(TCUtil.iv(memuser.getSex()));
 		List<PanoUserReceiveAddressModel> receiveAddressList = receiveAddressService.listByUser(userSn);

@@ -23,7 +23,7 @@ public class PanoUserReceiveAddressDao extends CommonDao<PanoUserReceiveAddressM
 	 */
 	public List<PanoUserReceiveAddressModel> listByUser(long userSn) {
 		PanoUserReceiveAddressCriteria criteria = new PanoUserReceiveAddressCriteria();
-		criteria.createCriteria().andUserSnEqualTo(userSn);
+		criteria.createCriteria().andUserSnEqualTo(userSn).andStatusEqualTo(1);
 		return selectByCriteria(criteria, PanoUserReceiveAddressModel.class);
 	}
 
