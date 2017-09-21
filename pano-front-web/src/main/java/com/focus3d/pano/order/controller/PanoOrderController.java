@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,7 +72,6 @@ import com.focus3d.pano.sms.service.SmsValidateService;
 import com.focus3d.pano.user.service.PanoMemUserService;
 import com.focus3d.pano.utils.Override;
 import com.focus3d.pano.utils.PayUtils;
-import com.focustech.common.utils.DateUtils;
 import com.focustech.common.utils.EncryptUtil;
 import com.focustech.common.utils.TCUtil;
 import com.lianpay.share.security.Md5Algorithm;
@@ -887,8 +887,7 @@ public class PanoOrderController extends AbstractPanoController {
 		PayDataBean payDataBean = JSON.parseObject(reqStr, PayDataBean.class);
 		String lianOderNum = payDataBean.getOid_paybill();
 		String payDateStr = payDataBean.getDt_order();
-		DateFormat df = new SimpleDateFormat("yyyyMMddHHssmm");
-		Date payDate = df.parse(payDateStr);
+		Date payDate = getPayTime(payDateStr);
 		int transPlatformType = 0;
 		try {
 			//
@@ -969,6 +968,23 @@ public class PanoOrderController extends AbstractPanoController {
 		return;
 	}
 	/**
+	 * 获取支付时间
+	 * *
+	 * @param payDateStr
+	 * @return
+	 * @throws ParseException
+	 */
+	private Date getPayTime(String payDateStr) throws ParseException {
+		try {
+			DateFormat df = new SimpleDateFormat("yyyyMMddHHssmm");
+			Date payDate = df.parse(payDateStr);
+			return payDate;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new Date();
+	}
+	/**
 	 * 
 	 * *
 	 * @param payDate 
@@ -1012,8 +1028,7 @@ public class PanoOrderController extends AbstractPanoController {
 		int transPlatformType = 0;
 		String oidPartner = payDataBean.getOid_partner();
 		String payDateStr = payDataBean.getDt_order();
-		DateFormat df = new SimpleDateFormat("yyyyMMddHHssmm");
-		Date payDate = df.parse(payDateStr);
+		Date payDate = getPayTime(payDateStr);
 		if(LianAuthPayConfig.OID_PARTNER.equals(oidPartner)){
 			transPlatformType = 1;
 		} else if(LianQuickPayConfig.OID_PARTNER.equals(oidPartner)){
@@ -1084,12 +1099,12 @@ public class PanoOrderController extends AbstractPanoController {
 			if (orderModel.getStatus().compareTo(2) == 0) {
 				throw new RuntimeException("订单已经支付");
 			}
-			resData.getTime_end();
-			updateOrderWhenNotify(new Date(), orderModel);
-
+			String payTimeStr = resData.getTime_end();
+			Date payDate = getPayTime(payTimeStr);
+			updateOrderWhenNotify(payDate, orderModel);
 			PanoOrderTransModel orderTransModel = new PanoOrderTransModel();
 			orderTransModel.setOrderId(resData.getOut_trade_no());
-			orderTransModel.setTransDate(new Date());
+			orderTransModel.setTransDate(payDate);
 			orderTransModel.setTransType("001");
 			orderTransModel.setTransPlatformType(1);
 			orderTransModel.setTransMoney(new BigDecimal(payAmount));
