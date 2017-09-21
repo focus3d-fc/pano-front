@@ -18,7 +18,38 @@ $(function(){
 			userPicker.hide();
 		}
 	});
+	
+	resizeSlider();
+	
+	$(function(){
+		var mySwiper = new Swiper ('#guidSwiper', {
+			loop: false,
+			autoplay: 0
+		});
+	});
+	
+	$(window).resize(function() {
+		setTimeout("resizeSlider()", 500);
+	});
+	
+	$("#lastGuidImg").click(function(){
+		$("#indexContent").show();
+		$("#guidSwiper").hide();
+	});
 });
+
+function resizeSlider(){
+	var winW = $(window).width();
+	var winH = $(window).height();
+	$("#guidSwiper").css("position", "absolute");
+	$("#guidSwiper").height(winH);
+	$("#guidSwiper").width(winW);
+	$("#guidSwiper").css("left", 0);
+	$("#guidSwiper").css("top", 0);
+	$("#guidSwiper img").attr("height", winH + " !important")
+	$("#guidSwiper img").attr("width", winW + " !important")
+}
+
 (function($, doc, jquery) {
 		$.init({
 			  gestureConfig:{

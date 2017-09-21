@@ -15,7 +15,7 @@
 		
 		}
 	</style>
-<div class="container index">
+<div id="indexContent" class="container index" style="display: none;">
     <!--广告-->
     <section class="banner">
         <div class="location">
@@ -77,11 +77,54 @@
     #end
     <div class="slogin">
        「&nbsp;格&nbsp;物&nbsp;至&nbsp;居&nbsp;」
-
     </div>
-
 </div>
+<style>
 
+.swiper-container {
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  text-align: center;
+}
+.swiper-slide .title {
+  font-style: italic;
+  font-size: 42px;
+  margin-bottom: 0;
+  line-height: 45px;
+}
+#guidSwiper{
+				margin:0 auto;
+				position:absolute;
+				top:0;
+				overflow:hidden;
+				direction:ltr;
+				-webkit-backface-visibility:hidden;
+				-moz-backface-visibility:hidden;
+				-ms-backface-visibility:hidden;
+				-o-backface-visibility:hidden;
+				backface-visibility:hidden;
+				/* Fix of Webkit flickering */
+				z-index:1;
+			}
+</style>
+
+<div id="guidSwiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide red-slide">
+       <img src="/images/guid/2.jpg"/>
+      </div>
+      <div class="swiper-slide blue-slide">
+        <img src="/images/guid/2.jpg"/>
+      </div>
+      <div class="swiper-slide orange-slide">
+        <img id="lastGuidImg" src="/images/guid/3.jpg"/>
+      </div>
+  </div>
+</div>
+<script>
+
+</script>
 <span id="projectSelectData" style="display: none;">$!projectSelectData</span>
 <script src="/style/h5static/lib/swiper/swiper.jquery.min.js"></script>
 <!-- 联动引入-->
