@@ -3,6 +3,7 @@ package com.focus3d.pano.order.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,6 +55,7 @@ import com.focus3d.pano.model.PanoUserBankcardModel;
 import com.focus3d.pano.model.PanoUserReceiveAddressModel;
 import com.focus3d.pano.model.PanoValidateModel;
 import com.focus3d.pano.order.pay.config.LianAuthPayConfig;
+import com.focus3d.pano.order.pay.config.LianQuickPayConfig;
 import com.focus3d.pano.order.pay.config.WxPayConfig;
 import com.focus3d.pano.order.service.PanoOrderCouponItemService;
 import com.focus3d.pano.order.service.PanoOrderLogtcService;
@@ -69,6 +71,7 @@ import com.focus3d.pano.sms.service.SmsValidateService;
 import com.focus3d.pano.user.service.PanoMemUserService;
 import com.focus3d.pano.utils.Override;
 import com.focus3d.pano.utils.PayUtils;
+import com.focustech.common.utils.DateUtils;
 import com.focustech.common.utils.EncryptUtil;
 import com.focustech.common.utils.TCUtil;
 import com.lianpay.share.security.Md5Algorithm;
@@ -389,7 +392,120 @@ public class PanoOrderController extends AbstractPanoController {
 				data.put("linkString", req_data);
 				data.put("outGateway", LianAuthPayConfig.PAY_URL);
 
-			} else if ("WX_H5".equals(payType)) {
+			} 
+			else if("LIANPAY_QUICK".equals(payType)){
+				//连连快捷支付
+				String acctName = StringUtils.trimToNull(request.getParameter("acct_name"));
+				String cardNo = StringUtils.trimToNull(request.getParameter("card_no"));
+				String idNo = StringUtils.trimToNull(request.getParameter("id_no"));
+				String userBankcardSnParam = StringUtils.trimToNull(request.getParameter("user_bankcard_sn"));
+				Long userBankcardSn = TCUtil.lv(userBankcardSnParam);
+				if (acctName == null){
+					throw new RuntimeException("请输入姓名");
+				}
+				if (cardNo == null){
+					throw new RuntimeException("请输入卡号");
+				} else if(cardNo.length() < 10){
+					throw new RuntimeException("卡号输入有误");
+				}
+				if (idNo == null){
+					throw new RuntimeException("请输入身份证");
+				} else if(idNo.length() < 10){
+					throw new RuntimeException("身份证号码输入有误");
+				}
+				// 保存银行卡信息
+				PanoUserBankcardModel userBankcard = null;
+				if (TCUtil.lv(userBankcardSn) > 0) {
+					userBankcard = userBankcardService.getBySn(userBankcardSn);
+				} else {
+					if(userBankcard == null){
+						userBankcard = userBankcardService.getByCardNo(userSn, cardNo);
+						if(userBankcard != null){
+							userBankcardService.delete(userBankcard);
+						}
+					}
+					userBankcard = new PanoUserBankcardModel();
+					userBankcard.setUserSn(userSn);
+					userBankcard.setCardNo(cardNo);
+					userBankcard.setUserName(acctName);
+					userBankcard.setCertNo(idNo);
+					userBankcardService.insert(userBankcard);
+				}
+				//组装连连支付报文
+				StringBuffer strBuf = new StringBuffer();
+				PaymentInfo payInfo = new PaymentInfo();
+				payInfo.setAcct_name(userBankcard.getUserName());
+				strBuf.append("&acct_name=").append(payInfo.getAcct_name());
+				// 请求应用标识 1-Android 2-ios 3-WAP
+				payInfo.setApp_request("3");
+				strBuf.append("&app_request=").append(payInfo.getApp_request());
+				// payInfo.setBg_color(request.getParameter("bg_color"));
+				// 商户业务类型 虚拟商品销售：101001实物商品销售：109001
+				payInfo.setBusi_partner(LianQuickPayConfig.BUSI_PARTNER);
+				strBuf.append("&busi_partner=").append(payInfo.getBusi_partner());
+
+				payInfo.setCard_no(userBankcard.getCardNo());
+				strBuf.append("&card_no=").append(payInfo.getCard_no());
+
+				// payInfo.setCard_no(request.getParameter("card_no"));
+				payInfo.setDt_order(DateUtil.getCurrentDateTimeStr1());
+				strBuf.append("&dt_order=").append(payInfo.getDt_order());
+
+				payInfo.setId_no(userBankcard.getCertNo());
+				strBuf.append("&id_no=").append(payInfo.getId_no());
+				// 订单描述变(255)
+				// payInfo.setInfo_order(request.getParameter("info_order"));
+				// 交易金额该笔订单的资金总额，单位为RMB-元。大于 0的数字，精确到小数点后两位。如：49.65
+				payInfo.setMoney_order(orderModel.getPayMoney().toString());
+				strBuf.append("&money_order=").append(payInfo.getMoney_order());
+				// 商品名称
+				payInfo.setName_goods("产品套餐");
+				strBuf.append("&name_goods=").append(payInfo.getName_goods());
+				// payInfo.setNo_agree(request.getParameter("no_agree"));签约协议号
+				// 商户唯一订单号
+				payInfo.setNo_order(orderModel.getOrderNum() + "");
+				strBuf.append("&no_order=").append(payInfo.getNo_order());
+				payInfo.setNotify_url(LianQuickPayConfig.NOTIFY_URL);
+				strBuf.append("&notify_url=").append(payInfo.getNotify_url());
+				// 商户编号
+				payInfo.setOid_partner(LianQuickPayConfig.OID_PARTNER);
+				strBuf.append("&oid_partner=").append(payInfo.getOid_partner());
+				// payInfo.setAcct_name(request.getParameter("acct_name"));
+				// 风险控制参数
+				JSONObject riskItem = new JSONObject();
+				riskItem.put("frms_ware_category", "2031");//产品类目
+				riskItem.put("user_info_mercht_userno", TCUtil.sv(orderModel.getUserSn()));//平台用户id
+				riskItem.put("user_info_dt_register", DateUtil.getCurrentDateTimeStr1(panoMemUserModel.getAddTime()));//平台用户注册时间
+				riskItem.put("user_info_bind_phone", TCUtil.sv(panoMemUserModel.getMobile()));//平台用户绑定的手机号
+				riskItem.put("user_info_full_name", userBankcard.getUserName());//平台用户实名
+				riskItem.put("user_info_id_no", userBankcard.getCertNo());//平台用户身份证号
+				riskItem.put("user_info_identify_state", 0);//是否实名
+				payInfo.setRisk_item(riskItem.toJSONString());
+				strBuf.append("&risk_item=").append(payInfo.getRisk_item());
+
+				payInfo.setSign_type("MD5");
+				strBuf.append("&sign_type=").append(payInfo.getSign_type());
+
+				payInfo.setUrl_return(LianQuickPayConfig.RETURN_URL);
+				strBuf.append("&url_return=").append(payInfo.getUrl_return());
+
+				payInfo.setUser_id(orderModel.getUserSn() + "");
+				strBuf.append("&user_id=").append(payInfo.getUser_id());
+				// payInfo.setValid_order(request.getParameter("valid_order"));
+
+				String sign_src = strBuf.toString();
+				if (sign_src.startsWith("&")) {
+					sign_src = sign_src.substring(1);
+				}
+				sign_src += "&key=" + LianQuickPayConfig.MD5_KEY;
+				String sign = Md5Algorithm.getInstance().md5Digest(sign_src.getBytes("utf-8"));
+				payInfo.setSign(sign);
+				String req_data = JSON.toJSONString(payInfo);
+				logger.debug(req_data);
+				data.put("linkString", req_data);
+				data.put("outGateway", LianQuickPayConfig.PAY_URL);
+			}
+			else if ("WX_H5".equals(payType)) {
 				//微信公众号支付
 				//验证微信登录 获取微信openid
 				PanoMemLoginModel memLogin = panoMemLoginService
@@ -768,8 +884,27 @@ public class PanoOrderController extends AbstractPanoController {
 			return;
 		}
 		System.out.println("接收支付异步通知数据：【" + reqStr + "】");
+		PayDataBean payDataBean = JSON.parseObject(reqStr, PayDataBean.class);
+		String lianOderNum = payDataBean.getOid_paybill();
+		String payDateStr = payDataBean.getDt_order();
+		DateFormat df = new SimpleDateFormat("yyyyMMddHHssmm");
+		Date payDate = df.parse(payDateStr);
+		int transPlatformType = 0;
 		try {
-			if (!YinTongUtil.checkSign(reqStr, LianAuthPayConfig.PUB_KEY, LianAuthPayConfig.MD5_KEY)) {
+			//
+			String oidPartner = payDataBean.getOid_partner();
+			String pubKey = "";
+			String md5Key = "";
+			if(LianAuthPayConfig.OID_PARTNER.equals(oidPartner)){
+				transPlatformType = 1;
+				pubKey = LianAuthPayConfig.PUB_KEY;
+				md5Key = LianAuthPayConfig.MD5_KEY;
+			} else if(LianQuickPayConfig.OID_PARTNER.equals(oidPartner)){
+				transPlatformType = 3;
+				pubKey = LianQuickPayConfig.PUB_KEY;
+				md5Key = LianQuickPayConfig.MD5_KEY;
+			}
+			if (!YinTongUtil.checkSign(reqStr, pubKey, md5Key)) {
 				retBean.setRet_code("9999");
 				retBean.setRet_msg("交易失败");
 				resp.getWriter().write(JSON.toJSONString(retBean));
@@ -787,7 +922,6 @@ public class PanoOrderController extends AbstractPanoController {
 		}
 		// 解析异步通知对象
 		try {
-			PayDataBean payDataBean = JSON.parseObject(reqStr, PayDataBean.class);
 			if ("SUCCESS".equals(payDataBean.getResult_pay())) {
 				BigDecimal payAmount = new BigDecimal(payDataBean.getMoney_order());
 				long orderId = Long.parseLong(payDataBean.getNo_order());
@@ -806,15 +940,15 @@ public class PanoOrderController extends AbstractPanoController {
 					resp.getWriter().flush();
 					return;
 				}
-				updateOrderWhenNotify(orderModel);
+				updateOrderWhenNotify(payDate, orderModel);
 				//保存交易记录
 				PanoOrderTransModel orderTransModel = new PanoOrderTransModel();
 				orderTransModel.setOrderId(TCUtil.sv(orderId));
-				orderTransModel.setTransDate(new Date());
+				orderTransModel.setTransDate(payDate);
 				orderTransModel.setTransType("001");
-				orderTransModel.setTransPlatformType(2);
+				orderTransModel.setTransPlatformType(transPlatformType);
 				orderTransModel.setTransMoney(payAmount);
-				orderTransModel.setTransId(orderNum);
+				orderTransModel.setTransId(lianOderNum);
 				orderTransModel.setTransStatus("SUCCESS");
 				panoOrderTransService.insert(orderTransModel);
 				//标记优惠券使用
@@ -832,15 +966,16 @@ public class PanoOrderController extends AbstractPanoController {
 			resp.getWriter().write(JSON.toJSONString(retBean));
 			resp.getWriter().flush();
 		}
-		
 		return;
 	}
 	/**
 	 * 
 	 * *
+	 * @param payDate 
 	 * @param orderModel
 	 */
-	private void updateOrderWhenNotify(PanoOrderModel orderModel) {
+	private void updateOrderWhenNotify(Date payDate, PanoOrderModel orderModel) {
+		orderModel.setPayTime(payDate);
 		orderModel.setStatus(2);
 		Long parentOrderSn = orderModel.getParentOrderSn();
 		if(parentOrderSn != -1){
@@ -872,25 +1007,34 @@ public class PanoOrderController extends AbstractPanoController {
 		String resultPay = resData.getString("result_pay");
 		String moneyOrder = resData.getString("money_order");
 		String noOrder = resData.getString("no_order");
-		String oidPaybill = resData.getString("oid_paybill ");
+		PayDataBean payDataBean = JSON.parseObject(resDataStr, PayDataBean.class);
+		String lianOrderNum = payDataBean.getOid_paybill();
+		int transPlatformType = 0;
+		String oidPartner = payDataBean.getOid_partner();
+		String payDateStr = payDataBean.getDt_order();
+		DateFormat df = new SimpleDateFormat("yyyyMMddHHssmm");
+		Date payDate = df.parse(payDateStr);
+		if(LianAuthPayConfig.OID_PARTNER.equals(oidPartner)){
+			transPlatformType = 1;
+		} else if(LianQuickPayConfig.OID_PARTNER.equals(oidPartner)){
+			transPlatformType = 3;
+		}
 		String orderSn = "";
 		if ("SUCCESS".equals(resultPay)) {
 			BigDecimal payAmount = new BigDecimal(moneyOrder);
-			String outPayId = oidPaybill;
 			PanoOrderModel orderModel = orderService.getOrderByNum(noOrder);
 			if (payAmount.compareTo(orderModel.getPayMoney()) != 0) {
 				throw new RuntimeException("支付金额不对");
 			} else {
 				if (orderModel.getStatus().compareTo(1) == 0) {
-					updateOrderWhenNotify(orderModel);
-					
+					updateOrderWhenNotify(payDate, orderModel);
 					PanoOrderTransModel orderTransModel = new PanoOrderTransModel();
 					orderTransModel.setOrderId(noOrder);
-					orderTransModel.setTransDate(new Date());
+					orderTransModel.setTransDate(payDate);
 					orderTransModel.setTransType("001");
-					orderTransModel.setTransPlatformType(1);
+					orderTransModel.setTransPlatformType(transPlatformType);
 					orderTransModel.setTransMoney(payAmount);
-					orderTransModel.setTransId(outPayId);
+					orderTransModel.setTransId(lianOrderNum);
 					orderTransModel.setTransStatus(resultPay);
 					panoOrderTransService.insert(orderTransModel);
 				}
@@ -940,7 +1084,8 @@ public class PanoOrderController extends AbstractPanoController {
 			if (orderModel.getStatus().compareTo(2) == 0) {
 				throw new RuntimeException("订单已经支付");
 			}
-			updateOrderWhenNotify(orderModel);
+			resData.getTime_end();
+			updateOrderWhenNotify(new Date(), orderModel);
 
 			PanoOrderTransModel orderTransModel = new PanoOrderTransModel();
 			orderTransModel.setOrderId(resData.getOut_trade_no());

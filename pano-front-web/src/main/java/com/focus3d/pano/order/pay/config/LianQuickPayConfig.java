@@ -15,7 +15,7 @@ public class LianQuickPayConfig extends CommonPayConfig{
 	//商户私钥
 	public static String OID_PRI_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCSS/DiwdCf/aZsxxcacDnooGph3d2JOj5GXWi+q3gznZauZjkNP8SKl3J2liP0O6rU/Y/29+IUe+GTMhMOFJuZm1htAtKiu5ekW0GlBMWxf4FPkYlQkPE0FtaoMP3gYfh+OwI+fIRrpW3ySn3mScnc6Z700nU/VYrRkfcSCbSnRwIDAQAB";
 	//连连支付WEB收银台支付服务地址
-	public static String PAY_URL = "https://cashier.lianlianpay.com/payment/bankgateway.htm";
+	public static String PAY_URL = "https://wap.lianlianpay.com/payment.htm";
 	//业务类型，连连支付根据商户业务为商户开设的业务类型； （101001：虚拟商品销售、109001：实物商品销售、108001：外部账户充值）
 	public static String BUSI_PARTNER = "101001";
 	//接收异步通知地址

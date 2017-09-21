@@ -51,7 +51,7 @@
 	                   		}
 	                  		return;
 	                   	}else{
-	                   		if(data.payType == 'LIANPAY_AUTH'){
+	                   		if(data.payType == 'LIANPAY_AUTH' || data.payType == 'LIANPAY_QUICK'){
 	                   			$('#lianpay input[name=req_data]').val(data.linkString);
 	                   			$('#lianpay').attr("action",data.outGateway);
 	                   			$('#lianpay').submit();
@@ -123,7 +123,7 @@
             <div class="row">
                 <p><i class="z-pay"><img src="/images/member/order/y-pay.png" alt="" ></i>银行卡</p><div pay_type="LIANPAY_AUTH" class="tick z-choose2"></div>
             </div>
-            <div class="row" style="display: none;">
+            <div class="row">
                 <p><i class="z-pay"><img src="/images/member/order/quick.png" alt="" ></i>快捷支付</p><div pay_type="LIANPAY_QUICK" class="tick z-choose"></div>
             </div>
             <div class="row">
