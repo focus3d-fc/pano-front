@@ -66,6 +66,7 @@ import com.focus3d.pano.order.service.PanoOrderService;
 import com.focus3d.pano.order.service.PanoOrderTransService;
 import com.focus3d.pano.pay.lianlian.utils.YinTongUtil;
 import com.focus3d.pano.project.service.PanoProjectHousePackageService;
+import com.focus3d.pano.project.service.PanoProjectService;
 import com.focus3d.pano.pub.controller.AbstractPanoController;
 import com.focus3d.pano.shopcart.service.PanoOrderShopCartService;
 import com.focus3d.pano.sms.service.SmsValidateService;
@@ -73,6 +74,7 @@ import com.focus3d.pano.user.service.PanoMemUserService;
 import com.focus3d.pano.utils.Override;
 import com.focus3d.pano.utils.PayUtils;
 import com.focustech.common.utils.EncryptUtil;
+import com.focustech.common.utils.HttpUtil;
 import com.focustech.common.utils.TCUtil;
 import com.lianpay.share.security.Md5Algorithm;
 import com.lianpay.share.util.DateUtil;
@@ -118,6 +120,8 @@ public class PanoOrderController extends AbstractPanoController {
 	private PanoUserBankcardService<PanoUserBankcardModel> userBankcardService;
 	@Autowired
 	private PanoOrderLogtcService<PanoOrderLogtcModel> orderLogtcService;
+	@Autowired
+	private PanoProjectService<PanoProjectModel> projectService;
 
 	/**
 	 * 跳转到支付页面
@@ -166,6 +170,7 @@ public class PanoOrderController extends AbstractPanoController {
 	public String orderConfirmPage(HttpServletRequest request, ModelMap modelMap)throws Exception {
 		Long userSn = LoginThreadLocal.getLoginInfo().getUserSn();
 		String packageSnsParam = request.getParameter("packageSns");
+		String projectEncryptSn = request.getParameter("projectId");
 		String[] shopcarts = packageSnsParam.split(",");
 		// find packages
 		BigDecimal payAmount = BigDecimal.ZERO;
@@ -197,6 +202,12 @@ public class PanoOrderController extends AbstractPanoController {
 		PanoMemUserModel memUser = panoMemUserService.getBySn(userSn);
 		modelMap.put("regMobile", com.focustech.common.utils.StringUtils.isNotEmpty(memUser.getMobile()));
 		modelMap.put("packageSns", packageSnsParam);
+		PanoProjectModel projectModel = projectService.getBySn(EncryptUtil.decode(projectEncryptSn));
+		double discount = projectModel.getDiscount() == null ? 1 : projectModel.getDiscount().doubleValue();
+		modelMap.put("discount", discount);
+		String discountName = TCUtil.sv((int)(discount * 100));
+		modelMap.put("discountName", discountName.replace("0", ""));
+		modelMap.put("projectId", projectModel.getEncryptSn());
 		return "/member/order/confirm";
 	}
 
@@ -572,6 +583,8 @@ public class PanoOrderController extends AbstractPanoController {
 	 */
 	@RequestMapping(value = "/create")
 	public void createOrder(HttpServletRequest request, HttpServletResponse response, ModelMap map) throws Exception {
+		String projectEncryptSn = HttpUtil.sv(request, "projectId");
+		PanoProjectModel project = projectService.getBySn(EncryptUtil.decode(projectEncryptSn));
 		PanoMemLoginModel loginInfo = LoginThreadLocal.getLoginInfo();
 		Long userSn = loginInfo.getUserSn();
 		JSONObject data = new JSONObject();
@@ -637,11 +650,11 @@ public class PanoOrderController extends AbstractPanoController {
 			// 分支付方案处理
 			PanoOrderModel orderModel = null;
 			//优惠
-			double discount = 1.00D;
+			float discount = 1.00f;
 			if ("FULL".equals(payScheme)) {
-				discount = 0.95D;
+				discount = project.getDiscount().floatValue();
 				// 全款支付
-				payAmount = dueAmount * 0.95f;
+				payAmount = dueAmount * discount;
 				orderModel = new PanoOrderModel();
 				orderModel.setOrderNum(generateOrderNum());
 				orderModel.setOrderTime(new Date());
@@ -867,7 +880,7 @@ public class PanoOrderController extends AbstractPanoController {
 	 * @param req
 	 * @param resp
 	 * @param map
-	 * @throws Exception
+	 * @throws Exceptiono
 	 */
 	@RequestMapping(value = "/lianpaynotify")
 	public void lianpayNotify(HttpServletRequest req, HttpServletResponse resp, ModelMap map) throws Exception {

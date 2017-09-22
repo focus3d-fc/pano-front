@@ -84,7 +84,7 @@
             </div>
             <p>
                 <a href="#" class="paying paybtn" onclick="choosePayScheme('FULL',this)">付全款
-                    <span class="red">95折</span>
+                    <span class="red">#if($!discountName != "1") $!{discountName}折 #end</span>
                 </a>
                 <a href="#" class="paid paybtn" onclick="choosePayScheme('STAGES',this)">预付2成</a>
             </p>
@@ -168,7 +168,9 @@ var packages = new Object();
 	packages['$!shopcart.housePackage.sn'].count=1
 #end
 
-calculate();
+$(function(){
+	calculate();
+});
 
 
 function calculate(){
@@ -199,7 +201,8 @@ function calculate(){
 	}
 	payAmount = payAmount - couponAmount;
 	if(payScheme == 'FULL'){
-		payAmount = parseFloat((payAmount*0.95).toFixed(2));
+		var discount = $("#discount").val();
+		payAmount = parseFloat((payAmount * discount).toFixed(2));
 		$('.new-tjdd .red').text(payAmount)
 		$('.new-tjdd .totalCount').text(totalCount)
 		$('.payAmountDesc').text('合计')
@@ -367,6 +370,7 @@ function choosePayScheme(paySchemeParam,ele){
    }
    
    function create_order(){
+	    var projectId = $("#projectId").val();
 	   	var status = $("#submitOrder").attr("status");
 	   	if(!status){
 	   		$("#submitOrder").attr("status", "1");
@@ -400,7 +404,8 @@ function choosePayScheme(paySchemeParam,ele){
 	           	 pay_scheme:payScheme,
 	           	 address_sn:addressSn,
 	           	 package_sns:orderparam_package_sns,
-	   	 		 package_counts:orderparam_package_counts
+	   	 		 package_counts:orderparam_package_counts,
+	   	 		 projectId:projectId
 	   	 
 	            },
 	            url: '/order/create',
@@ -425,3 +430,5 @@ function choosePayScheme(paySchemeParam,ele){
    }
 </script>
 <script src="/script/member/order/confirm.js"></script>
+<input type="hidden" id="discount" value="$!discount"/>
+<input type="hidden" id="projectId" value="$!projectId"/>
