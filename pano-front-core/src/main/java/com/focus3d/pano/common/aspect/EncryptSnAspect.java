@@ -47,9 +47,11 @@ public class EncryptSnAspect {
 
 		}*/
 		if(retList instanceof List){
-			List<CommonModel> l = (List<CommonModel>)retList;
-			for (CommonModel commonModel : l) {
-				commonModel.setEncryptSn(EncryptUtil.encode(commonModel.getSn()));
+			for (Object obj : (List)retList) {
+				if(obj instanceof CommonModel){
+					CommonModel commonModel = (CommonModel)obj;
+					commonModel.setEncryptSn(EncryptUtil.encode(commonModel.getSn()));
+				}
 			}
 		} else {
 			try {

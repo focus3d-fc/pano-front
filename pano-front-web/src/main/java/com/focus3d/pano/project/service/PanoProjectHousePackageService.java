@@ -25,4 +25,11 @@ public interface PanoProjectHousePackageService<T> extends CommonService<T> {
 	 * @return
 	 */
 	List<T> listByProject(long projectSn, long houseSn, long styleSn);
+	/**
+	 * 
+	 * *
+	 * @param projectSn
+	 * @return
+	 */
+	List listProjectPackagePrice(long projectSn);
 }
