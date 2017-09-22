@@ -32,6 +32,7 @@ import com.focustech.common.utils.EncryptUtil;
 import com.focustech.common.utils.HttpUtil;
 import com.focustech.common.utils.ListUtils;
 import com.focustech.common.utils.StringUtils;
+import com.focustech.common.utils.TCUtil;
 
 /**
  * 
@@ -89,6 +90,14 @@ public class IndexController extends BaseController{
 		}    
 		modelMap.addAttribute("styleList",styleList);
 		modelMap.put("checkProjectSn", checkProjectSn);
+		
+		PanoMemLoginModel loginInfo = LoginThreadLocal.getLoginInfo();
+		if(loginInfo != null){
+			Long userSn = loginInfo.getUserSn();
+			PanoMemUserModel memUserModel = memUserService.getBySn(userSn);
+			Integer guidRead = memUserModel.getGuidRead();
+			modelMap.put("guidRead", TCUtil.iv(guidRead));
+		}
 		return "/pub/index";
 	}
 	/**

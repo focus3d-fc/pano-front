@@ -97,8 +97,9 @@
 			}
 </style>
 
-<div id="guidSwiper">
+<div id="guidSwiper" style="display: block;">
 	<div class="swiper-wrapper">
+		  #if($!guidRead != "1")
 	      <div class="swiper-slide red-slide">
 	       <img src="/images/guid/1.jpg"/>
 	      </div>
@@ -108,9 +109,10 @@
 	      <div class="swiper-slide orange-slide">
 	        <img id="lastGuidImg" src="/images/guid/3.jpg"/>
 	      </div>
+	      #end
   	</div>
 </div>
-
+<input type="hidden" id="guidRead" value="$!guidRead"/>
 <span id="projectSelectData" style="display: none;">$!projectSelectData</span>
 <script src="/style/h5static/lib/swiper/swiper.jquery.min.js"></script>
 <!-- 联动引入-->

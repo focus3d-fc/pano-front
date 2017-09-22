@@ -1,6 +1,17 @@
 var userPicker;
 $(function(){
 	
+	var readGuid = $("#guidRead").val();
+	if(readGuid == "1"){
+		$("#guidSwiper").hide();
+    	$("#indexContent").show();
+    	var mySwiper = new Swiper ('.swiper-container', {
+    		autoplay: 5000,//可选选项，自动滑动
+    		loop: true,
+    		pagination: '.swiper-pagination',
+    	});
+	}
+	
 	$("a[id^='ad_']").click(function(){
 		var lk = $(this).attr("lk");
 		if(lk){
@@ -28,30 +39,28 @@ $(function(){
 	});
 	
 	$("#lastGuidImg").click(function(){
-		$("#indexContent").show();
-		$("#guidSwiper").hide();
-		var mySwiper = new Swiper ('.swiper-container', {
-			autoplay: 5000,//可选选项，自动滑动
-			loop: true,
-			pagination: '.swiper-pagination',
-		})
-		/*$.ajax({
-		    url: panoDomain + "/shopcart/add",
+		$.ajax({
+		    url:  "/index/readguid",
 		    type:'GET',
 		    async:false,
 		    timeout:5000,
 		    dataType: "json",
 		    data:{
-		    	packageEncryptSn : packageSn
+		    	
 		    },
 		    success:function(data){
 		    	$("#indexContent").show();
-				$("#guidSwiper").hide();
+		    	$("#guidSwiper").hide();
+		    	var mySwiper = new Swiper ('.swiper-container', {
+		    		autoplay: 5000,//可选选项，自动滑动
+		    		loop: true,
+		    		pagination: '.swiper-pagination',
+		    	});
 		    },
 		    error:function(xhr,textStatus){
 		    	
 		    }
-		});*/
+		});
 	});
 });
 

@@ -50,6 +50,7 @@ public class LoginFilter extends AbstractFilter {
 		,"/cross-domain-policy.dtd"
 		, "/common/*"
 		,"/index"
+		,"/index/readguid"
 		, "/qrcode/*"
 		,"/sms/send"
 		, "/captchas/*"
