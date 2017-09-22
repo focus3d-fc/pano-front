@@ -1,8 +1,10 @@
 package com.focus3d.pano.index.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 
@@ -13,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.focus3d.pano.common.controller.BaseController;
+import com.focus3d.pano.filter.LoginThreadLocal;
 import com.focus3d.pano.model.Lable;
+import com.focus3d.pano.model.PanoMemLoginModel;
+import com.focus3d.pano.model.PanoMemUserModel;
 import com.focus3d.pano.model.PanoProjectModel;
 import com.focus3d.pano.model.Style;
 import com.focus3d.pano.model.pano_ad;
@@ -21,6 +26,7 @@ import com.focus3d.pano.project.component.ProjectSelect;
 import com.focus3d.pano.project.component.ProjectSelectLeaf;
 import com.focus3d.pano.project.component.ProjectSelectNode;
 import com.focus3d.pano.project.service.PanoProjectService;
+import com.focus3d.pano.user.service.PanoMemUserService;
 import com.focus3d.pano.usersside.service.UsersSideService;
 import com.focustech.common.utils.EncryptUtil;
 import com.focustech.common.utils.HttpUtil;
@@ -40,6 +46,8 @@ public class IndexController extends BaseController{
 	private UsersSideService usersSideService;
 	@Autowired
 	private PanoProjectService<PanoProjectModel> projectService;
+	@Autowired
+	private PanoMemUserService<PanoMemUserModel> memUserService;
 	/**
 	 * *
 	 * @param id
@@ -121,5 +129,20 @@ public class IndexController extends BaseController{
 			return jo.getString("children");
 		}
 		return "";
+	}
+	
+	
+	@RequestMapping(value = "/readguid", method = RequestMethod.GET)
+	public void readGuid(HttpServletResponse response) throws IOException{
+		PanoMemLoginModel loginInfo = LoginThreadLocal.getLoginInfo();
+		if(loginInfo != null){
+			Long userSn = loginInfo.getUserSn();
+			PanoMemUserModel user = memUserService.getBySn(userSn);
+			user.setGuidRead(1);
+			memUserService.update(user);
+		}
+		JSONObject jo = new JSONObject();
+		jo.put("status", 1);
+		ajaxOutput(response, jo.toString());
 	}
 }

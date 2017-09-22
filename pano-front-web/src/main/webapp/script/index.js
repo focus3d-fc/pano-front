@@ -1,10 +1,5 @@
 var userPicker;
 $(function(){
-	var mySwiper = new Swiper ('.swiper-container', {
-		autoplay: 5000,//可选选项，自动滑动
-		loop: true,
-		pagination: '.swiper-pagination',
-	})
 	
 	$("a[id^='ad_']").click(function(){
 		var lk = $(this).attr("lk");
@@ -35,6 +30,28 @@ $(function(){
 	$("#lastGuidImg").click(function(){
 		$("#indexContent").show();
 		$("#guidSwiper").hide();
+		var mySwiper = new Swiper ('.swiper-container', {
+			autoplay: 5000,//可选选项，自动滑动
+			loop: true,
+			pagination: '.swiper-pagination',
+		})
+		/*$.ajax({
+		    url: panoDomain + "/shopcart/add",
+		    type:'GET',
+		    async:false,
+		    timeout:5000,
+		    dataType: "json",
+		    data:{
+		    	packageEncryptSn : packageSn
+		    },
+		    success:function(data){
+		    	$("#indexContent").show();
+				$("#guidSwiper").hide();
+		    },
+		    error:function(xhr,textStatus){
+		    	
+		    }
+		});*/
 	});
 });
 
