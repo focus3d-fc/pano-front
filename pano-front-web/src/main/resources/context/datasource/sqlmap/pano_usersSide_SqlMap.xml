@@ -275,7 +275,6 @@ where project_sn = #PROJECT_SN#
  </select>
  <!-- 查风格img_sn和name -->
  <select id="selectStyleByProject_sn" parameterClass="long" resultClass="com.focus3d.pano.model.Style">
- 
 	SELECT 
 		project.`NAME` AS project_name,
 		baseStyle.`NAME` AS NAME,
@@ -290,17 +289,28 @@ where project_sn = #PROJECT_SN#
 		ON baseStyle.sn = projectStyle.style_sn
 		INNER JOIN (
 			SELECT 
-				MIN(discount_price) AS start_price,
-				SUM(discount_price)AS end_price,
-				_houseStyle.style_sn,
-				_houseStyle.img_sn,
-				_houseStyle.house_sn,
-				_houseStyle.project_sn
-				FROM pano_project_house_style _houseStyle 
-				LEFT JOIN pano_project_house_package package ON package.house_style_sn = _houseStyle.sn 
-				INNER JOIN pano_project_style _proj_style ON _proj_style.SN = _houseStyle.STYLE_SN
-			WHERE _houseStyle.PROJECT_SN = #project_sn#
-			GROUP BY _proj_style.SN
+				style_sn,
+				MIN(start_price) start_price,
+				MAX(end_price) end_price,
+				img_sn,
+				house_sn,
+				project_sn
+			FROM
+			(
+				SELECT 
+					MIN(discount_price) AS start_price,
+					SUM(discount_price)AS end_price,
+					_houseStyle.style_sn,
+					_houseStyle.img_sn,
+					_houseStyle.house_sn,
+					_houseStyle.project_sn
+					FROM pano_project_house_style _houseStyle 
+					LEFT JOIN pano_project_house_package package ON package.house_style_sn = _houseStyle.sn 
+					INNER JOIN pano_project_style _proj_style ON _proj_style.SN = _houseStyle.STYLE_SN
+				WHERE _houseStyle.PROJECT_SN = #project_sn#
+				GROUP BY package.house_style_sn
+			) _tb_price
+			GROUP BY _tb_price.style_sn
 		) AS houseStyle
 		ON houseStyle.style_sn = projectStyle.sn
 		INNER JOIN pano_project_house house

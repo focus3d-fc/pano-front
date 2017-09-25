@@ -87,4 +87,9 @@ public class PanoProjectHousePackageServiceImpl extends CommonServiceImpl<PanoPr
 		return housePackageDao.listByProject(projectSn, houseSn, styleSn);
 	}
 
+	@Override
+	public List listProjectPackagePrice(long projectSn) {
+		return housePackageDao.listProjectPackagePrice(projectSn);
+	}
+
 }

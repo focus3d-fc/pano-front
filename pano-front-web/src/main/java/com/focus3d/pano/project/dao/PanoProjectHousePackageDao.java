@@ -18,6 +18,7 @@ import com.focus3d.pano.model.PanoProjectHousePackageModel;
 @Repository
 public class PanoProjectHousePackageDao extends CommonDao<PanoProjectHousePackageModel> {
 	private static final String LIST_BY_PROJECT = "c_pano_project_house_package.listByProject";
+	private static final String LIST_PACKAGE_PRICE = "c_pano_project_house_package.listProjectPackagePrice";
 	/**
 	 * 
 	 * *
@@ -31,6 +32,17 @@ public class PanoProjectHousePackageDao extends CommonDao<PanoProjectHousePackag
 		parameter.put("styleSn", styleSn);
 		try {
 			return getSqlMapClient().queryForList(LIST_BY_PROJECT, parameter);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public List listProjectPackagePrice(long projectSn){
+		Map<String, Object> parameter = new HashMap<String, Object>();
+		parameter.put("projectSn", projectSn);
+		try {
+			return getSqlMapClient().queryForList(LIST_PACKAGE_PRICE, parameter);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
