@@ -464,7 +464,7 @@ function CaculateSpace(data){
     		}
         	
         	for(var key in data.view){
-        		if($.inArray(key,view_list)==-1){
+        		if($.inArray(parseInt(key),view_list)==-1){
         			view_list.push(data.view[key].id);
         		}
         	}
