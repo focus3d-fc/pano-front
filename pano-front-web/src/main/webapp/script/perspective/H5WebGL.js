@@ -619,7 +619,9 @@ function CreatePerspective(data){
             		random_elementId =  _data.elementId;
             	}
            	 	var element_data = new Object();
-           	 	loading_texture[_data.elementId] = true;
+           	 	if(_data.elementMapUrl!=undefined&&_data.elementMapUrl!=""){
+           	 		loading_texture[_data.elementId] = true;
+           	 	}
                 element_data.elementId = _data.elementId;
                 element_data.productId = _data.productId;
                 element_data.elementName = _data.elementName;
