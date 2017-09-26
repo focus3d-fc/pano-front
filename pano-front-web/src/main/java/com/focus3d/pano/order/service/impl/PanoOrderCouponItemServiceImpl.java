@@ -34,7 +34,7 @@ public class PanoOrderCouponItemServiceImpl extends CommonServiceImpl<PanoOrderC
 		return orderCouponItemDao;
 	}
 	@Override
-	public PanoOrderCouponItemModel getByCode(String codeNum) {
+	public PanoOrderCouponItemModel getByCode(long projectSn, String codeNum) {
 		PanoOrderCouponItemModel couponItem = orderCouponItemDao.getByCode(codeNum);
 		if(couponItem != null){
 			Long couponSn = couponItem.getCouponSn();
@@ -42,23 +42,28 @@ public class PanoOrderCouponItemServiceImpl extends CommonServiceImpl<PanoOrderC
 			if(coupon != null){
 				couponItem.setCoupon(coupon);
 				int status = 0;
-				try {
-					Date startDate = coupon.getStartDate();
-					Date endDate = coupon.getEndDate();
-					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-					String format = df.format(new Date());
-					Date now = df.parse(format);
-					if(now.compareTo(startDate) < 0){
-						status = 1;//未生效
-					} else if(now.compareTo(endDate) > 0){
-						status = 2;//已过期
-					} else if(couponItem.getCodeStatus() == 1){
-						status = 3;//已被使用过
+				long projSn = coupon.getProjectSn();
+				if(projSn != projectSn){
+					status = 4;
+				} else {
+					try {
+						Date startDate = coupon.getStartDate();
+						Date endDate = coupon.getEndDate();
+						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+						String format = df.format(new Date());
+						Date now = df.parse(format);
+						if(now.compareTo(startDate) < 0){
+							status = 1;//未生效
+						} else if(now.compareTo(endDate) > 0){
+							status = 2;//已过期
+						} else if(couponItem.getCodeStatus() == 1){
+							status = 3;//已被使用过
+						}
+					} catch (ParseException e) {
+						e.printStackTrace();
 					}
-					couponItem.setStatus(status);
-				} catch (ParseException e) {
-					e.printStackTrace();
 				}
+				couponItem.setStatus(status);
 				return couponItem;
 			}
 		}

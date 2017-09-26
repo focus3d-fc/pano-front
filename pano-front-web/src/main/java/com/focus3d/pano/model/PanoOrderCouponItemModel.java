@@ -19,7 +19,7 @@ public class PanoOrderCouponItemModel extends PanoOrderCouponItem<PanoOrderCoupo
 
 	private PanoOrderCouponModel coupon;
 	
-	private int status;//0-可用 1-未生效 2-过期 3-已被使用过
+	private int status;//0-可用 1-未生效 2-过期 3-已被使用过 4-优惠券不是该项目下的
 
 	public int getStatus() {
 		return status;

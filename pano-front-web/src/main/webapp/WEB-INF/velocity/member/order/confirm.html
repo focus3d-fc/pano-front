@@ -315,11 +315,12 @@ function choosePayScheme(paySchemeParam,ele){
 		});
     	if($('[name=couponCode]').val().length==6){
     		$('[name=couponCode]').blur();
+    		var projectId = $("#projectId").val();
     		$.ajax({
                 type: 'GET',
                 async: false,
                 data: {},
-                url: '/order/coupon?code='+event.target.value,
+                url: '/order/coupon?code='+event.target.value + "&projectId=" + projectId,
                 dataType: 'json',
                 success: function (data) {
                 	if(!data.discountAmount){
@@ -330,6 +331,8 @@ function choosePayScheme(paySchemeParam,ele){
                     	alert('优惠券过期')
                     }else if(data.status == 3){
                     	alert('优惠券已使用')
+                    }else if(data.status == 4){
+                    	alert('优惠券不可用')
                     }
                     else{
                     	couponAmount = data.discountAmount;

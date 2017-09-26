@@ -215,12 +215,13 @@ public class PanoOrderController extends AbstractPanoController {
 	 * 获取优惠券信息
 	 * @param request
 	 * @param response
-	 * @throws IOException
+	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/coupon")
-	public void coupon(HttpServletRequest request, HttpServletResponse response)throws IOException {
+	public void coupon(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		String code = request.getParameter("code");
-		PanoOrderCouponItemModel panoOrderCouponItemModel = panoOrderCouponItemService.getByCode(code);
+		String projectId = HttpUtil.sv(request, "projectId");
+		PanoOrderCouponItemModel panoOrderCouponItemModel = panoOrderCouponItemService.getByCode(EncryptUtil.decode(projectId), code);
 		JSONObject jo = new JSONObject();
 		if (panoOrderCouponItemModel != null) {
 			jo.put("status", panoOrderCouponItemModel.getStatus());
@@ -637,7 +638,7 @@ public class PanoOrderController extends AbstractPanoController {
 			// 校验优惠券，计算金额
 			PanoOrderCouponItemModel coupon = null;
 			if (couponCode != null) {
-				coupon = panoOrderCouponItemService.getByCode(couponCode);
+				coupon = panoOrderCouponItemService.getByCode(project.getSn(), couponCode);
 				if (coupon == null) {
 					throw new RuntimeException("优惠券不存在");
 				} else if (coupon.getStatus() != 0) {

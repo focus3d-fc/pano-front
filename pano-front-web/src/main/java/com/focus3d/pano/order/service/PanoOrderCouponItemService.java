@@ -12,10 +12,11 @@ public interface PanoOrderCouponItemService<T> extends CommonService<T> {
 	/**
 	 * 查找优惠券
 	 * *
+	 * @param code 
 	 * @param code 优惠券码
 	 * @return
 	 */
-	T getByCode(String codeNum);
+	T getByCode(long projectSn, String codeNum);
 	
 	T getByOrderSn(Long orderSn);
 }
