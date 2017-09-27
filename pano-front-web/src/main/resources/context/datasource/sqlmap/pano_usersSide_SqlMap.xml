@@ -298,8 +298,8 @@ where project_sn = #PROJECT_SN#
 			FROM
 			(
 				SELECT 
-					MIN(discount_price) AS start_price,
-					SUM(discount_price)AS end_price,
+					MIN(round(discount_price)) AS start_price,
+					SUM(round(discount_price))AS end_price,
 					_houseStyle.style_sn,
 					_houseStyle.img_sn,
 					_houseStyle.house_sn,
