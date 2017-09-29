@@ -207,8 +207,13 @@ public class PanoOrderController extends AbstractPanoController {
 		modelMap.put("discount", discount);
 		String discountName = TCUtil.sv((int)(discount * 100));
 		modelMap.put("discountName", discountName.replace("0", ""));
-		modelMap.put("projectId", projectModel.getEncryptSn());
 		//分期付
+		double percent = projectModel.getPercent() == null ? 1 : projectModel.getPercent().doubleValue();
+		modelMap.put("percent", percent);
+		String percentName = TCUtil.sv((int)(percent * 10));
+		modelMap.put("percentName", percentName.replace("0", ""));
+		
+		modelMap.put("projectId", projectModel.getEncryptSn());
 		return "/member/order/confirm";
 	}
 
@@ -653,6 +658,7 @@ public class PanoOrderController extends AbstractPanoController {
 			PanoOrderModel orderModel = null;
 			//优惠
 			float discount = 1.00f;
+			float percent = 1.00f;
 			if ("FULL".equals(payScheme)) {
 				discount = project.getDiscount().floatValue();
 				// 全款支付
@@ -673,8 +679,9 @@ public class PanoOrderController extends AbstractPanoController {
 				orderModel.setDiscount(new BigDecimal(discount));
 				orderService.insert(orderModel);
 			} else if ("STAGES".equals(payScheme)) {
+				percent = project.getPercent().floatValue();
 				// 分期付款
-				float stage1Amount = dueAmount * 0.2f;
+				float stage1Amount = dueAmount * percent;
 				float stage2Amount = dueAmount - stage1Amount;
 				payAmount = stage1Amount;
 				orderModel = new PanoOrderModel();
@@ -803,6 +810,9 @@ public class PanoOrderController extends AbstractPanoController {
 					continue;
 				}
 				PanoProjectModel project = housePackage.getProject();
+				if(project == null){
+					continue;
+				}
 				//按项目分组
 				Long projectSn = project.getSn();
 				if(projectGroupMap.containsKey(projectSn)){

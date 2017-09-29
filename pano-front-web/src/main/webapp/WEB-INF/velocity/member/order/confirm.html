@@ -86,7 +86,7 @@
                 <a href="#" class="paying paybtn" onclick="choosePayScheme('FULL',this)">付全款
                     <span class="red">#if($!discountName != "1") $!{discountName}折 #end</span>
                 </a>
-                <a href="#" class="paid paybtn" onclick="choosePayScheme('STAGES',this)">预付2成</a>
+                <a href="#" class="paid paybtn" onclick="choosePayScheme('STAGES',this)">预付$!percentName成</a>
             </p>
             
             <!--new code 20170825 begin-->
@@ -207,7 +207,8 @@ function calculate(){
 		$('.new-tjdd .totalCount').text(totalCount)
 		$('.payAmountDesc').text('合计')
 	}else{
-		var stage1Amount = payAmount*0.2;
+		var percent = $("#percent").val();
+		var stage1Amount = payAmount * percent;
 		stage1Amount= parseFloat(stage1Amount.toFixed(2))
 		var stage2Amount = payAmount - stage1Amount;
 		payAmount=stage1Amount;
@@ -434,4 +435,5 @@ function choosePayScheme(paySchemeParam,ele){
 </script>
 <script src="/script/member/order/confirm.js"></script>
 <input type="hidden" id="discount" value="$!discount"/>
+<input type="hidden" id="percent" value="$!percent"/>
 <input type="hidden" id="projectId" value="$!projectId"/>
