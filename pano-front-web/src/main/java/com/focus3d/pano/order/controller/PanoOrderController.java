@@ -1,6 +1,5 @@
 package com.focus3d.pano.order.controller;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -203,11 +202,13 @@ public class PanoOrderController extends AbstractPanoController {
 		modelMap.put("regMobile", com.focustech.common.utils.StringUtils.isNotEmpty(memUser.getMobile()));
 		modelMap.put("packageSns", packageSnsParam);
 		PanoProjectModel projectModel = projectService.getBySn(EncryptUtil.decode(projectEncryptSn));
+		//优惠折扣
 		double discount = projectModel.getDiscount() == null ? 1 : projectModel.getDiscount().doubleValue();
 		modelMap.put("discount", discount);
 		String discountName = TCUtil.sv((int)(discount * 100));
 		modelMap.put("discountName", discountName.replace("0", ""));
 		modelMap.put("projectId", projectModel.getEncryptSn());
+		//分期付
 		return "/member/order/confirm";
 	}
 
