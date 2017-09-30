@@ -24,6 +24,11 @@ public class PanoOrderModel extends PanoOrder<PanoOrderModel, PanoOrderCriteria>
 	
 	private PanoOrderModel parentOrder;
 
+	private Double discountValue;
+	private String discountName;
+	private Double percentValue;
+	private String percentName;
+	
 	public PanoOrderModel getChildrenOrder() {
 		return childrenOrder;
 	}
@@ -118,5 +123,37 @@ public class PanoOrderModel extends PanoOrder<PanoOrderModel, PanoOrderCriteria>
 
 	public void setParentOrder(PanoOrderModel parentOrder) {
 		this.parentOrder = parentOrder;
+	}
+
+	public String getDiscountName() {
+		return discountName;
+	}
+
+	public void setDiscountName(String discountName) {
+		this.discountName = discountName;
+	}
+	
+	public Double getDiscountValue() {
+		return discountValue;
+	}
+
+	public void setDiscountValue(Double discountValue) {
+		this.discountValue = discountValue;
+	}
+
+	public Double getPercentValue() {
+		return percentValue;
+	}
+
+	public void setPercentValue(Double percentValue) {
+		this.percentValue = percentValue;
+	}
+
+	public String getPercentName() {
+		return percentName;
+	}
+
+	public void setPercentName(String percentName) {
+		this.percentName = percentName;
 	}
 }

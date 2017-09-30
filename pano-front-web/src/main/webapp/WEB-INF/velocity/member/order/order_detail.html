@@ -127,7 +127,7 @@
 	          		<div style="line-height:20px">实付金额：<span style="float:right;">￥$!order.payMoney</span></div>
           		 #end 
           		 #if($!order.leftPay==1)
-          		 	<div style="line-height:20px;color:grey;">预付2成：<span style="float:right;">￥$!dueStage1Money</span></div>
+          		 	<div style="line-height:20px;color:grey;">预付$!order.percentName成：<span style="float:right;">￥$!dueStage1Money</span></div>
           		 	<div style="line-height:20px">实付定金：<span style="float:right;">￥$!order.payMoney</span></div>
           		 	<div style="line-height:20px">商品尾款：<span style="float:right;color:red;">￥$!order.leftMoney</span></div>
           		 #end 
@@ -203,5 +203,4 @@
 	});
         
     })
-   
 </script>

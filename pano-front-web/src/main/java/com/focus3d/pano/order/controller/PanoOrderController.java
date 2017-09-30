@@ -847,7 +847,12 @@ public class PanoOrderController extends AbstractPanoController {
 		Long orderSn = Long.parseLong(orderSnParam);
 		PanoOrderModel order = orderService.getOrderDetail(orderSn);
 		map.put("order", order);
-		map.put("dueStage1Money", (int) (order.getSumMoney().floatValue() * 0.2 * 100) / 100.0);
+		try {
+			Double percentValue = order.getPercentValue();
+			map.put("dueStage1Money", (int) (order.getSumMoney().floatValue() * percentValue * 100) / 100.0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return "/member/order/order_detail";
 	}
 	/**

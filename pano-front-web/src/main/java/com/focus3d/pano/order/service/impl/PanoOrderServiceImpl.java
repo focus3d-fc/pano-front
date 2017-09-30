@@ -1,5 +1,6 @@
 package com.focus3d.pano.order.service.impl;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import com.focus3d.pano.model.PanoOrderPackageDetailModel;
 import com.focus3d.pano.model.PanoOrderPackageModel;
 import com.focus3d.pano.model.PanoProductModel;
 import com.focus3d.pano.model.PanoProjectHousePackageModel;
+import com.focus3d.pano.model.PanoProjectModel;
 import com.focus3d.pano.model.PanoProjectPackageProductModel;
 import com.focus3d.pano.model.PanoProjectPackageTypeModel;
 import com.focus3d.pano.model.PanoUserReceiveAddressModel;
@@ -105,6 +107,7 @@ public class PanoOrderServiceImpl extends CommonServiceImpl<PanoOrderModel> impl
 		order.setAddress(address);
 		order.setCouponItem(coupon);
 		List<PanoOrderPackageModel> orderPackages = orderPackageDao.listByOrder(orderSn);
+		int i = 0;
 		for (PanoOrderPackageModel orderPackage : orderPackages) {
 			//订单套餐明细信息
 			List<PanoOrderPackageDetailModel> orderPackageDetails = orderPackageDetailDao.listByOrderPackage(orderPackage.getSn());
@@ -131,6 +134,24 @@ public class PanoOrderServiceImpl extends CommonServiceImpl<PanoOrderModel> impl
 			PanoProjectHousePackageModel housePackage = housePackageService.getDetail(orderPackage.getHousePackageSn());
 			orderPackage.setHousePackage(housePackage);
 			order.getOrderPackages().add(orderPackage);
+			
+			if(i == 0){
+				try {
+					//优惠折扣
+					PanoProjectModel project = housePackage.getProject();
+					double discount = project.getDiscount() == null ? 1 : project.getDiscount().doubleValue();
+					String discountName = TCUtil.sv((int)(discount * 100)).replace("0", "");
+					//分期付
+					double percent = project.getPercent() == null ? 1 : project.getPercent().doubleValue();
+					String percentName = TCUtil.sv((int)(percent * 10)).replace("0", "");
+					order.setDiscountValue(discount);
+					order.setDiscountName(discountName);
+					order.setPercentValue(percent);
+					order.setPercentName(percentName);
+				} catch (Exception e) {
+				}
+				i ++;
+			}
 		}
 		return order;
 	}
