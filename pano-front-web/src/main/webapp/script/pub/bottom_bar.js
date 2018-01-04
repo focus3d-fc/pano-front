@@ -1,4 +1,5 @@
-    $(function(){
+var Swiper3;    
+$(function(){
        $('.rd').click(function () {
            $(this).hide();
            $('.rd-show').show();
@@ -16,11 +17,11 @@
            slidesPerGroup : 1,
            spaceBetween:10,
        })
-       var Swiper3 = new Swiper('.swiper3',{
+       Swiper3 = new Swiper('.swiper3',{
            autoplayStopOnLast:true,
            slidesPerView : 4,
            slidesPerGroup : 1,
-           spaceBetween:10,
+           spaceBetween:10
        })
        var Swiper4 = new Swiper('.swiper4',{
            spaceBetween : 20,

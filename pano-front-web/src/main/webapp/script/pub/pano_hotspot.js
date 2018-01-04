@@ -138,12 +138,15 @@ function getFjshow(panoId){
 	    jsonp: "jsoncallback", 
 	    success:function(data){
 	    	$("#scrollArea").children().remove();
+	    	var tempAry = [];
+	    	//Swiper3.removeAllSlides();
 	    	for(var i in data){
 	    		var sceneId = data[i].sceneId;
 	    		var sceneName = data[i].sceneName;
 	    		var sceneThumb = data[i].sceneThumb;
 	    		var img = $("<img/>").attr("src", sceneThumb).attr("scene_id",sceneId);
-	    		 $("<div/>").addClass("bd-r2").addClass("mar_r01").addClass("swiper-slide" + (i == 0 ? " bd-r " : "")).append($("<div/>").append(img).append($("<p/>").text(sceneName))).appendTo($("#hx-swiper-wrapper"));
+	    		//$("<div/>").addClass("bd-r2").addClass("mar_r01").addClass("swiper-slide" + (i == 0 ? " bd-r " : "")).append($("<div/>").append(img).append($("<p/>").text(sceneName))).appendTo($("#hx-swiper-wrapper"));
+	    		Swiper3.appendSlide($("<div/>").addClass("bd-r2").addClass("mar_r01").addClass("swiper-slide" + (i == 0 ? " bd-r " : "")).append($("<div/>").append(img).append($("<p/>").text(sceneName))));
 	    		//点击房间图片，切换场景
 	    		img.bind("click", function(){
 	    			$("#hx-swiper-wrapper").find("img").removeClass("hxfj_border");
@@ -151,6 +154,7 @@ function getFjshow(panoId){
 	    			editorKrpano().call("loadscene(" + $(this).attr("scene_id") + ",null, MERGE, OPENBLEND(0.5, 0.0, 0.75, 0.05, linear))");
 	    		});
 	    	}
+    		
 	    },
 	    error:function(xhr,textStatus){
 	        console.log('请求错误')
